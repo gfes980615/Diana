@@ -22,10 +22,8 @@ func MainApis() {
 	router.Run()
 }
 
-var bot = glob.Bot
-
 func callbackHandler(c *gin.Context) {
-	events, err := bot.ParseRequest(c.Request)
+	events, err := glob.Bot.ParseRequest(c.Request)
 	if err != nil {
 		log.Print(err.Error())
 		if err == linebot.ErrInvalidSignature {
@@ -49,19 +47,19 @@ func callbackHandler(c *gin.Context) {
 
 				if message.Text == "a" {
 					daily := line.GetEveryDaySentence()
-					bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(daily)).Do()
+					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(daily)).Do()
 					return
 				}
 
 				id, transferErr := strconv.ParseInt(message.Text, 10, 64)
 				text := line.GetGoogleExcelValueById(id)
 				if transferErr != nil {
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(transferErr.Error())).Do(); err != nil {
+					if _, err = glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(transferErr.Error())).Do(); err != nil {
 						log.Print(err)
 					}
 					return
 				}
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(text)).Do(); err != nil {
+				if _, err = glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(text)).Do(); err != nil {
 					log.Print(err)
 				}
 			}
