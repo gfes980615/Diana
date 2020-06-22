@@ -26,6 +26,8 @@ func main() {
 		c.Data(200, "text/plain", []byte("Hello, It Home!"))
 	})
 
+	router.POST("/callback", callbackHandler)
+
 	router.Run()
 
 	// defer func() {
@@ -44,14 +46,20 @@ func main() {
 	// http.HandleFunc("/test", test)
 }
 
-func callbackHandler(w http.ResponseWriter, r *http.Request) {
-	events, err := bot.ParseRequest(r)
+func callbackHandler(c *gin.Context) {
+	events, err := bot.ParseRequest(c.Request)
 	if err != nil {
 		log.Print(err.Error())
 		if err == linebot.ErrInvalidSignature {
-			w.WriteHeader(400)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "fail",
+				"reason": "values error.",
+			})
 		} else {
-			w.WriteHeader(500)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "fail",
+				"reason": "values error.",
+			})
 		}
 		return
 	}
