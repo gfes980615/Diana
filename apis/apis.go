@@ -51,6 +51,12 @@ func callbackHandler(c *gin.Context) {
 					return
 				}
 
+				if message.Text == "maple story" {
+					maple := line.GetMapleStoryAnnouncement()
+					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(maple)).Do()
+					return
+				}
+
 				id, transferErr := strconv.ParseInt(message.Text, 10, 64)
 				text := line.GetGoogleExcelValueById(id)
 				if transferErr != nil {

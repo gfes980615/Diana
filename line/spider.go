@@ -2,36 +2,52 @@ package line
 
 import (
 	"fmt"
-	"github.com/axgle/mahonia"
-	"github.com/gfes980615/Diana/glob"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/axgle/mahonia"
+	"github.com/gfes980615/Diana/glob"
 )
 
 const (
 	baseRegexp = `<li><a href="/([a-z]+)/">(.{4,6})</a></li>`
 	subRegexp  = `<li><h3><a href="(.{0,20})" title="(.{0,10})" target="_blank">`
+	GBK        = "gbk"
+	UTF8       = "utf-8"
 )
 
 var (
-	bot     = glob.Bot
-	baseURL = "https://www.1juzi.com/"
+	bot          = glob.Bot
+	baseURL      = "https://www.1juzi.com/"
+	mapleBaseURL = "https://tw.beanfun.com/maplestory/"
 )
 
 func GetEveryDaySentence() string {
-	juziSubURL := setJuziURL(baseURL, baseRegexp)
+	juziSubURL := setURL(baseURL, baseRegexp, GBK)
 	r := getRandomNumber(len(juziSubURL))
-	subListURL := setJuziURL(baseURL+juziSubURL[r].URL, subRegexp)
+	subListURL := setURL(baseURL+juziSubURL[r].URL, subRegexp, GBK)
 	lr := getRandomNumber(len(subListURL))
-	result := getPageSource(baseURL + subListURL[lr].URL)
+	result := getPageSource(baseURL+subListURL[lr].URL, GBK)
 	rp := regexp.MustCompile(`<p>([0-9]+)、(.*?)</p>`)
 	items := rp.FindAllStringSubmatch(result, -1)
 	ir := getRandomNumber(len(items))
-	return fmt.Sprintf("%s > %s:\n\n%s", juziSubURL[r].CategoryName, subListURL[lr].CategoryName, items[ir][2])
+	return fmt.Sprintf("%s > %s:\n\n%s", juziSubURL[r].Name, subListURL[lr].Name, items[ir][2])
+}
+
+func GetMapleStoryAnnouncement() string {
+	url := "https://tw.beanfun.com/maplestory/BullentinList.aspx?cate=71"
+	tmpRegex := `<TD class="maple01"><a href=(.*?)>(.*?)</a></TD>`
+	items := setURL(url, tmpRegex, UTF8)
+	announcement := ""
+	for _, item := range items {
+		announcement += fmt.Sprintf("%s\n%s%s\n\n", item.Name, mapleBaseURL, item.URL)
+	}
+
+	return announcement
 }
 
 func getRandomNumber(number int) int {
@@ -39,20 +55,20 @@ func getRandomNumber(number int) int {
 	return rand.Int() % number
 }
 
-func setJuziURL(url string, regex string) []URLStruct {
-	juziSubURL := []URLStruct{}
-	result := getPageSource(url)
+func setURL(url string, regex string, code string) []URLStruct {
+	subURL := []URLStruct{}
+	result := getPageSource(url, code)
 	rp := regexp.MustCompile(regex)
 	items := rp.FindAllStringSubmatch(result, -1)
 	for _, item := range items {
-		tmp := URLStruct{CategoryName: item[2], URL: item[1]}
-		juziSubURL = append(juziSubURL, tmp)
+		tmp := URLStruct{Name: item[2], URL: item[1]}
+		subURL = append(subURL, tmp)
 	}
 
-	return juziSubURL
+	return subURL
 }
 
-func getPageSource(url string) string {
+func getPageSource(url string, code string) string {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
@@ -70,7 +86,7 @@ func getPageSource(url string) string {
 	if err != nil {
 		fmt.Println("Read error", err)
 	}
-	result := ConvertToString(string(body), "gbk", "utf-8")
+	result := ConvertToString(string(body), code, "utf-8")
 
 	return strings.Replace(result, "\n", "", -1)
 }
