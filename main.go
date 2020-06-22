@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -15,25 +14,34 @@ import (
 	"time"
 
 	"github.com/axgle/mahonia"
+	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 var bot *linebot.Client
 
 func main() {
-	defer func() {
-		if rc := recover(); rc != nil {
-			log.Printf("panic:\n%v\n", rc)
-		}
-	}()
-	port := os.Getenv("PORT")
-	addr := fmt.Sprintf(":%s", port)
-	go http.ListenAndServe(addr, nil)
+	router := gin.Default()
+	router.GET("/hello", func(c *gin.Context) {
+		c.Data(200, "text/plain", []byte("Hello, It Home!"))
+	})
 
-	var err error
-	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
-	log.Println("Bot:", bot, " err:", err)
-	http.HandleFunc("/callback", callbackHandler)
+	router.Run()
+
+	// defer func() {
+	// 	if rc := recover(); rc != nil {
+	// 		log.Printf("panic:\n%v\n", rc)
+	// 	}
+	// }()
+	// port := os.Getenv("PORT")
+	// addr := fmt.Sprintf(":%s", port)
+	// go http.ListenAndServe(addr, nil)
+
+	// var err error
+	// bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
+	// log.Println("Bot:", bot, " err:", err)
+	// http.HandleFunc("/callback", callbackHandler)
+	// http.HandleFunc("/test", test)
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
