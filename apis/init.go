@@ -13,6 +13,11 @@ var (
 	ChannelAccessToken string
 )
 
+func init() {
+	initEnvConfig()
+	initLineBot()
+}
+
 func initEnvConfig() {
 	ChannelSecret = os.Getenv("ChannelSecret")
 	ChannelAccessToken = os.Getenv("ChannelAccessToken")
@@ -22,10 +27,4 @@ func initLineBot() {
 	var err error
 	glob.Bot, err = linebot.New(ChannelSecret, ChannelAccessToken)
 	log.Println("Bot:", glob.Bot, " err:", err)
-}
-
-// InitSetting ...
-func Init() {
-	initEnvConfig()
-	initLineBot()
 }
