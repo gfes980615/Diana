@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -21,6 +22,10 @@ import (
 var bot *linebot.Client
 
 func main() {
+	var err error
+	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
+	log.Println("Bot:", bot, " err:", err)
+
 	router := gin.Default()
 	router.GET("/hello", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("Hello, It Home!"))
@@ -39,9 +44,6 @@ func main() {
 	// addr := fmt.Sprintf(":%s", port)
 	// go http.ListenAndServe(addr, nil)
 
-	// var err error
-	// bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
-	// log.Println("Bot:", bot, " err:", err)
 	// http.HandleFunc("/callback", callbackHandler)
 	// http.HandleFunc("/test", test)
 }
