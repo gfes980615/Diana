@@ -1,4 +1,4 @@
-module github.com/gfes980615/Diana
+module Diana
 
 go 1.13
 
