@@ -44,6 +44,11 @@ func GetMapleStoryAnnouncement() string {
 	items := setURL(url, tmpRegex, UTF8)
 	announcement := ""
 	for _, item := range items {
+		match, _ := regexp.MatchString("https://(.*?)", item.URL)
+		if match {
+			announcement += fmt.Sprintf("%s\n%s\n\n", item.Name, item.URL)
+			continue
+		}
 		announcement += fmt.Sprintf("%s\n%s%s\n\n", item.Name, mapleBaseURL, item.URL)
 	}
 
