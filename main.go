@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 	"time"
 
 	"github.com/axgle/mahonia"
+	"github.com/gfes980615/Diana/apis"
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -22,9 +22,7 @@ import (
 var bot *linebot.Client
 
 func main() {
-	var err error
-	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
-	log.Println("Bot:", bot, " err:", err)
+	apis.Init()
 
 	router := gin.Default()
 	router.GET("/hello", func(c *gin.Context) {
@@ -34,18 +32,6 @@ func main() {
 	router.POST("/callback", callbackHandler)
 
 	router.Run()
-
-	// defer func() {
-	// 	if rc := recover(); rc != nil {
-	// 		log.Printf("panic:\n%v\n", rc)
-	// 	}
-	// }()
-	// port := os.Getenv("PORT")
-	// addr := fmt.Sprintf(":%s", port)
-	// go http.ListenAndServe(addr, nil)
-
-	// http.HandleFunc("/callback", callbackHandler)
-	// http.HandleFunc("/test", test)
 }
 
 func callbackHandler(c *gin.Context) {
@@ -91,7 +77,7 @@ func callbackHandler(c *gin.Context) {
 			}
 		}
 	}
-	// fmt.Println(getEveryDaySentence())
+
 }
 
 func getGoogleExcelValueById(id int64) string {
