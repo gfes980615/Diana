@@ -21,11 +21,11 @@ func initEnvConfig() {
 func initLineBot() {
 	var err error
 	glob.Bot, err = linebot.New(ChannelSecret, ChannelAccessToken)
-	log.Println("Bot:", bot, " err:", err)
+	log.Println("Bot:", glob.Bot, " err:", err)
 }
 
 // InitSetting ...
-func InitSetting() {
+func Init() {
 	initEnvConfig()
 	initLineBot()
 }
