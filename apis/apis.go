@@ -20,6 +20,7 @@ func MainApis() {
 	router.POST("/callback", callbackHandler)
 
 	router.Run()
+	// line.Get8591CurrencyValue()
 }
 
 func callbackHandler(c *gin.Context) {
@@ -54,6 +55,12 @@ func callbackHandler(c *gin.Context) {
 				if message.Text == "maple story" {
 					maple := line.GetMapleStoryAnnouncement()
 					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(maple)).Do()
+					return
+				}
+
+				if message.Text == "izcr" {
+					currencyValue := line.Get8591CurrencyValue()
+					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(currencyValue)).Do()
 					return
 				}
 

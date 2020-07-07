@@ -92,6 +92,7 @@ func getPageSource(url string, code string) string {
 		fmt.Println("Read error", err)
 	}
 	result := ConvertToString(string(body), code, "utf-8")
+	writeToFile(body)
 
 	return strings.Replace(result, "\n", "", -1)
 }
@@ -103,4 +104,12 @@ func ConvertToString(src string, srcCode string, tagCode string) string {
 	_, cdata, _ := tagCoder.Translate([]byte(srcResult), true)
 	result := string(cdata)
 	return result
+}
+
+func writeToFile(b []byte) {
+	// write the whole body at once
+	err := ioutil.WriteFile("regexp.html", b, 0644)
+	if err != nil {
+		panic(err)
+	}
 }
