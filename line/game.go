@@ -27,16 +27,34 @@ func Get8591CurrencyValue() string {
 	result := getPageSource(fmt.Sprintf(URL8591, "0"), UTF8)
 	count := getAllCount(result)
 	tmpArray := []string{}
-
+	pageResult := make(chan string, count/raw+1)
 	// 取得每條商品資訊
 	for i := 0; i < count; i = i + raw {
-		result := getPageSource(fmt.Sprintf(URL8591, i), UTF8)
-		rp := regexp.MustCompile(regexpA)
-		items := rp.FindAllStringSubmatch(result, -1)
-		for _, item := range items {
-			tmpArray = append(tmpArray, item[2])
+		go func(index int) {
+			tmpResult := getPageSource(fmt.Sprintf(URL8591, index), UTF8)
+			pageResult <- tmpResult
+		}(i)
+	}
+
+	for i := 0; i < count; i = i + raw {
+		select {
+		case tmp := <-pageResult:
+			rp := regexp.MustCompile(regexpA)
+			items := rp.FindAllStringSubmatch(tmp, -1)
+			for _, item := range items {
+				tmpArray = append(tmpArray, item[2])
+			}
 		}
 	}
+	// // 取得每條商品資訊
+	// for i := 0; i < count; i = i + raw {
+	// 	result := getPageSource(fmt.Sprintf(URL8591, i), UTF8)
+	// 	rp := regexp.MustCompile(regexpA)
+	// 	items := rp.FindAllStringSubmatch(result, -1)
+	// 	for _, item := range items {
+	// 		tmpArray = append(tmpArray, item[2])
+	// 	}
+	// }
 	// 將幣值取出，string -> int 存成 array
 	currencyValueArray := []float64{}
 	for _, t := range tmpArray {
@@ -56,6 +74,5 @@ func Get8591CurrencyValue() string {
 	for i := 0; i < 5; i++ {
 		message += fmt.Sprintf("1 : %.f萬\n", currencyValueArray[i])
 	}
-
 	return message
 }

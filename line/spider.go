@@ -80,7 +80,6 @@ func getPageSource(url string, code string) string {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Http get err:", err)
-
 	}
 	if resp.StatusCode != 200 {
 		fmt.Println("Http status code:", resp.StatusCode)
