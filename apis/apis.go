@@ -20,7 +20,7 @@ func MainApis() {
 	router.POST("/callback", callbackHandler)
 
 	router.Run()
-	// line.Get8591CurrencyValue()
+	// fmt.Println(line.Get8591CurrencyValue("plt"))
 }
 
 func callbackHandler(c *gin.Context) {
@@ -58,8 +58,13 @@ func callbackHandler(c *gin.Context) {
 					return
 				}
 
-				if message.Text == "izcr" {
-					currencyValue := line.Get8591CurrencyValue()
+				if message.Text == "楓谷幣值" {
+					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(glob.MapleCurrencyMessage)).Do()
+					return
+				}
+
+				if _, ok := glob.MapleServerMap[message.Text]; ok {
+					currencyValue := line.Get8591CurrencyValue(message.Text)
 					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(currencyValue)).Do()
 					return
 				}
