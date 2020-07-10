@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/line"
@@ -18,9 +19,20 @@ func MainApis() {
 		c.Data(200, "text/plain", []byte("Hello, It Home!"))
 	})
 	router.POST("/callback", callbackHandler)
-
+	router.POST("/currency", addCurrency)
 	router.Run()
-	// fmt.Println(line.Get8591CurrencyValue("plt"))
+	// line.GetMapleCurrencyMessage("izr")
+}
+
+type Currency struct {
+	AddedTime time.Time `gorm:"column:added_time"`
+	Value     float64   `gorm:"column:value"`
+	Server    string    `gorm:"column:server"`
+}
+
+func addCurrency(c *gin.Context) {
+	line.AddAllServerCurrency()
+	c.JSON(200, "開始蒐集資料")
 }
 
 func callbackHandler(c *gin.Context) {
@@ -64,7 +76,7 @@ func callbackHandler(c *gin.Context) {
 				}
 
 				if _, ok := glob.MapleServerMap[message.Text]; ok {
-					currencyValue := line.Get8591CurrencyValue(message.Text)
+					currencyValue := line.GetMapleCurrencyMessage(message.Text)
 					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(currencyValue)).Do()
 					return
 				}
