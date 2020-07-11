@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/line"
@@ -14,20 +13,33 @@ import (
 
 func MainApis() {
 	router := gin.Default()
-
+	router.LoadHTMLGlob("template/*")
 	router.GET("/hello", func(c *gin.Context) {
 		c.Data(200, "text/plain", []byte("Hello, It Home!"))
 	})
 	router.POST("/callback", callbackHandler)
 	router.POST("/currency", addCurrency)
+	router.GET("/currency/chart", currencyChart)
+
 	router.Run()
 	// line.GetMapleCurrencyMessage("izr")
 }
 
-type Currency struct {
-	AddedTime time.Time `gorm:"column:added_time"`
-	Value     float64   `gorm:"column:value"`
-	Server    string    `gorm:"column:server"`
+func currencyChart(c *gin.Context) {
+	result, err := line.GetMapleCurrencyChartData()
+	if err != nil {
+		c.JSON(400, "error")
+		return
+	}
+	c.HTML(http.StatusOK, "echarts.html", gin.H{
+		"date": result.Date,
+		"izcr": result.Izcr,
+		"izr":  result.Izr,
+		"ld":   result.Ld,
+		"plt":  result.Plt,
+		"slc":  result.Slc,
+		"yen":  result.Yen,
+	})
 }
 
 func addCurrency(c *gin.Context) {

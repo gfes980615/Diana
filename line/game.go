@@ -9,6 +9,7 @@ import (
 
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
+	"github.com/gfes980615/Diana/model"
 )
 
 const (
@@ -108,6 +109,7 @@ func addCurrency(currencySlice []float64, server string) error {
 			return err.Error
 		}
 	}
+	defer mysql.Close()
 
 	return nil
 }
@@ -119,4 +121,43 @@ func AddAllServerCurrency() {
 			get8591CurrencyValueTop5(server)
 		}(server)
 	}
+}
+
+// GetMapleCurrencyChartData ...
+func GetMapleCurrencyChartData() (model.ReturnSlice, error) {
+	r := model.ReturnSlice{}
+	mysql, err := db.NewMySQL(glob.DataBase)
+	if err != nil {
+		return r, err
+	}
+	currency := []*model.Currency{}
+	result := mysql.DB.Raw("select added_time, server, avg(value) as value from currency group by added_time, server order by added_time asc").Scan(&currency)
+	if result.Error != nil {
+		return r, result.Error
+	}
+
+	tmpDateMap := make(map[string]bool)
+	for _, item := range currency {
+		date := item.AddedTime.Format("2006-01-02")
+		if _, exist := tmpDateMap[date]; !exist {
+			r.Date = append(r.Date, date)
+			tmpDateMap[date] = true
+		}
+		switch item.Server {
+		case "izcr":
+			r.Izcr = append(r.Izcr, item.Value)
+		case "izr":
+			r.Izr = append(r.Izr, item.Value)
+		case "ld":
+			r.Ld = append(r.Ld, item.Value)
+		case "plt":
+			r.Plt = append(r.Plt, item.Value)
+		case "slc":
+			r.Slc = append(r.Slc, item.Value)
+		case "yen":
+			r.Yen = append(r.Yen, item.Value)
+		}
+	}
+
+	return r, nil
 }

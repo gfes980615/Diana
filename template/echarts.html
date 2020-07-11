@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts - 孤影'Blog</title>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:400px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts图表
+        var myChart = echarts.init(document.getElementById('main'));
+        var option = {
+            title: {
+                text: '折线图堆叠'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['愛麗西亞', '艾莉亞', '琉德', '普利特', '殺人鯨', '優依那']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: {{.date}}
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '愛麗西亞',
+                    type: 'line',
+                    stack: '总量',
+                    data: {{.izcr}}
+                },
+                {
+                    name: '艾莉亞',
+                    type: 'line',
+                    stack: '总量',
+                    data: {{.izr}}
+                },
+                {
+                    name: '琉德',
+                    type: 'line',
+                    stack: '总量',
+                    data: {{.ld}}
+                },
+                {
+                    name: '普利特',
+                    type: 'line',
+                    stack: '总量',
+                    data: {{.plt}}
+                },
+                {
+                    name: '殺人鯨',
+                    type: 'line',
+                    stack: '总量',
+                    data: {{.slc}}
+                },
+                {
+                    name: '優依娜',
+                    type: 'line',
+                    stack: '总量',
+                    data: {{.yen}}
+                }
+            ]
+        };
+        // 为echarts对象加载数据 
+        myChart.setOption(option); 
+    </script>
+</body>
+
