@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/model"
 	_ "github.com/go-sql-driver/mysql" //加载mysql
 	"github.com/jinzhu/gorm"
