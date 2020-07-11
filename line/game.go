@@ -136,6 +136,7 @@ func GetMapleCurrencyChartData() (model.ReturnSlice, error) {
 		return r, result.Error
 	}
 
+	defer mysql.Close()
 	tmpDateMap := make(map[string]bool)
 	for _, item := range currency {
 		date := item.AddedTime.Format("2006-01-02")
