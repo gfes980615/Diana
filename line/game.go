@@ -138,27 +138,38 @@ func GetMapleCurrencyChartData() (model.ReturnSlice, error) {
 
 	defer mysql.Close()
 	tmpDateMap := make(map[string]bool)
+	min := currency[0].Value
+	max := currency[0].Value
 	for _, item := range currency {
 		date := item.AddedTime.Format("2006-01-02")
 		if _, exist := tmpDateMap[date]; !exist {
 			r.Date = append(r.Date, date)
 			tmpDateMap[date] = true
 		}
+		if item.Value > max {
+			max = item.Value
+		}
+		if item.Value < min {
+			min = item.Value
+		}
 		switch item.Server {
 		case "izcr":
-			r.Izcr = append(r.Izcr, item.Value)
+			r.Izcr = append(r.Izcr, glob.FloatRound(item.Value))
 		case "izr":
-			r.Izr = append(r.Izr, item.Value)
+			r.Izr = append(r.Izr, glob.FloatRound(item.Value))
 		case "ld":
-			r.Ld = append(r.Ld, item.Value)
+			r.Ld = append(r.Ld, glob.FloatRound(item.Value))
 		case "plt":
-			r.Plt = append(r.Plt, item.Value)
+			r.Plt = append(r.Plt, glob.FloatRound(item.Value))
 		case "slc":
-			r.Slc = append(r.Slc, item.Value)
+			r.Slc = append(r.Slc, glob.FloatRound(item.Value))
 		case "yen":
-			r.Yen = append(r.Yen, item.Value)
+			r.Yen = append(r.Yen, glob.FloatRound(item.Value))
 		}
 	}
+
+	r.YMax = int(max/10)*10 + 10
+	r.YMin = int(min/10)*10 - 10
 
 	return r, nil
 }

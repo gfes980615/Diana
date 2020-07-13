@@ -39,6 +39,8 @@ func currencyChart(c *gin.Context) {
 		"plt":  result.Plt,
 		"slc":  result.Slc,
 		"yen":  result.Yen,
+		"ymax": result.YMax,
+		"ymin": result.YMin,
 	})
 }
 

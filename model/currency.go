@@ -16,4 +16,6 @@ type ReturnSlice struct {
 	Plt  []float64
 	Slc  []float64
 	Yen  []float64
+	YMax int
+	YMin int
 }
