@@ -6,6 +6,7 @@ type Currency struct {
 	AddedTime time.Time `gorm:"column:added_time"`
 	Value     float64   `gorm:"column:value"`
 	Server    string    `gorm:"column:server"`
+	Title     string    `gorm:"column:title"`
 }
 
 type ReturnSlice struct {

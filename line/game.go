@@ -41,9 +41,9 @@ func GetMapleCurrencyMessage(mapleServer string) string {
 // get8591CurrencyValueTop5 ...
 func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	// 取得所有數量
-	result := getPageSource(fmt.Sprintf(URL8591, glob.MapleServerMap[mapleServer], 0), UTF8)
-	count := getAllCount(result)
-	tmpArray := []string{}
+	resultPage := getPageSource(fmt.Sprintf(URL8591, glob.MapleServerMap[mapleServer], 0), UTF8)
+	count := getAllCount(resultPage)
+	titleArray := []string{}
 	pageResult := make(chan string, count/raw+1)
 	// 取得每條商品資訊
 	for i := 0; i < count; i = i + raw {
@@ -59,52 +59,63 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 			rp := regexp.MustCompile(regexpA)
 			items := rp.FindAllStringSubmatch(tmp, -1)
 			for _, item := range items {
-				tmpArray = append(tmpArray, item[2])
+				titleArray = append(titleArray, item[2])
 			}
 		}
 	}
+
 	// 將幣值取出，string -> int 存成 array
-	currencySlice := []float64{}
-	for _, t := range tmpArray {
+	currencySlice := []model.Currency{}
+	for _, title := range titleArray {
 		rp := regexp.MustCompile(rCurrencyValue)
-		items := rp.FindAllStringSubmatch(t, -1)
+		items := rp.FindAllStringSubmatch(title, -1)
+		var value float64
 		for _, item := range items {
 			a, _ := strconv.Atoi(item[1])
 			b, _ := strconv.Atoi(item[2])
-			currencySlice = append(currencySlice, float64(b)/float64(a))
+			value = float64(b) / float64(a)
 		}
+		currencySlice = append(currencySlice, model.Currency{Value: value, Server: mapleServer, Title: title})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {
-		return currencySlice[i] > currencySlice[j]
+		return currencySlice[i].Value > currencySlice[j].Value
 	})
 
+	reuslt := []float64{}
 	if len(currencySlice) < 5 {
-		err := addCurrency(currencySlice, mapleServer)
+		err := addCurrency(currencySlice)
 		if err != nil {
 			log.Println("addCurrency error: ", err)
 		}
-		return currencySlice, count
+		for _, c := range currencySlice {
+			reuslt = append(reuslt, c.Value)
+		}
+		return reuslt, count
 	}
 
 	// 存入MYSQL
-	err := addCurrency(currencySlice[0:5], mapleServer)
+	err := addCurrency(currencySlice[0:5])
 	if err != nil {
 		log.Println("addCurrency error: ", err)
 	}
 
-	return currencySlice[0:5], count
+	for _, c := range currencySlice {
+		reuslt = append(reuslt, c.Value)
+	}
+
+	return reuslt, count
 }
 
 // addCurrency 存入MYSQL
-func addCurrency(currencySlice []float64, server string) error {
+func addCurrency(currencySlice []model.Currency) error {
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		return err
 	}
 
 	for _, c := range currencySlice {
-		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`) VALUES (NOW(),?,?)", c, server)
+		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`) VALUES (NOW(),?,?,?)", c.Value, c.Server, c.Title)
 		if err.Error != nil {
 			return err.Error
 		}

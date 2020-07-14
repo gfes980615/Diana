@@ -31,7 +31,7 @@ func currencyChart(c *gin.Context) {
 		c.JSON(400, "error")
 		return
 	}
-	c.HTML(http.StatusOK, "echarts.html", gin.H{
+	chartData := map[string]interface{}{
 		"date": result.Date,
 		"izcr": result.Izcr,
 		"izr":  result.Izr,
@@ -41,7 +41,8 @@ func currencyChart(c *gin.Context) {
 		"yen":  result.Yen,
 		"ymax": result.YMax,
 		"ymin": result.YMin,
-	})
+	}
+	c.HTML(http.StatusOK, "echarts.html", chartData)
 }
 
 func addCurrency(c *gin.Context) {
