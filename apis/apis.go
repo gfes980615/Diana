@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/line"
@@ -19,28 +20,40 @@ func MainApis() {
 	})
 	router.POST("/callback", callbackHandler)
 	router.POST("/currency", addCurrency)
-	router.GET("/currency/chart", currencyChart)
+	router.GET("/currency/chart/:subfunc", currencyChart)
 
 	router.Run()
 	// line.GetMapleCurrencyMessage("izr")
 }
 
 func currencyChart(c *gin.Context) {
-	result, err := line.GetMapleCurrencyChartData()
+	subfunc := c.Param("subfunc")
+	result, err := line.GetMapleCurrencyChartData(subfunc)
 	if err != nil {
-		c.JSON(400, "error")
+		c.JSON(400, err)
 		return
 	}
+	var category string
+	switch subfunc {
+	case "avg":
+		category = "每日平均幣值"
+	case "max":
+		category = "每日最高幣值"
+	default:
+
+	}
+
 	chartData := map[string]interface{}{
-		"date": result.Date,
-		"izcr": result.Izcr,
-		"izr":  result.Izr,
-		"ld":   result.Ld,
-		"plt":  result.Plt,
-		"slc":  result.Slc,
-		"yen":  result.Yen,
-		"ymax": result.YMax,
-		"ymin": result.YMin,
+		"date":    result.Date,
+		"izcr":    result.Izcr,
+		"izr":     result.Izr,
+		"ld":      result.Ld,
+		"plt":     result.Plt,
+		"slc":     result.Slc,
+		"yen":     result.Yen,
+		"ymax":    result.YMax,
+		"ymin":    result.YMin,
+		"subfunc": category,
 	}
 	c.HTML(http.StatusOK, "echarts.html", chartData)
 }
@@ -72,7 +85,7 @@ func callbackHandler(c *gin.Context) {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-
+				message.Text = strings.TrimSpace(message.Text)
 				if message.Text == "a" {
 					daily := line.GetEveryDaySentence()
 					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(daily)).Do()

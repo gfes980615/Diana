@@ -17,7 +17,7 @@ const (
 	URL8591        = "https://www.8591.com.tw/mallList-list.html?&group=1&searchType=0&priceSort=0&ratios=0&searchGame=859&searchServer=%d&firstRow=%d"
 	regexpA        = `<a class="detail_link" href="(.*?)" target="_blank" class="goods_link" title="(.*?)" data-key="0">`
 	rCount         = `<span class="R">([0-9]+)</span>`
-	rCurrencyValue = `【([0-9]+):([0-9]+)萬】`
+	rCurrencyValue = `【([0-9]+):(.*?)萬】`
 )
 
 func getAllCount(page string) int {
@@ -64,16 +64,16 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 		}
 	}
 
-	// 將幣值取出，string -> int 存成 array
+	// 將幣值取出，string -> float 存成 array
 	currencySlice := []model.Currency{}
 	for _, title := range titleArray {
 		rp := regexp.MustCompile(rCurrencyValue)
 		items := rp.FindAllStringSubmatch(title, -1)
 		var value float64
 		for _, item := range items {
-			a, _ := strconv.Atoi(item[1])
-			b, _ := strconv.Atoi(item[2])
-			value = float64(b) / float64(a)
+			a, _ := strconv.ParseFloat(item[1], 64)
+			b, _ := strconv.ParseFloat(item[2], 64)
+			value = b / a
 		}
 		currencySlice = append(currencySlice, model.Currency{Value: value, Server: mapleServer, Title: title})
 	}
@@ -100,7 +100,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 		log.Println("addCurrency error: ", err)
 	}
 
-	for _, c := range currencySlice {
+	for _, c := range currencySlice[0:5] {
 		reuslt = append(reuslt, c.Value)
 	}
 
@@ -135,14 +135,15 @@ func AddAllServerCurrency() {
 }
 
 // GetMapleCurrencyChartData ...
-func GetMapleCurrencyChartData() (model.ReturnSlice, error) {
+func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
 	r := model.ReturnSlice{}
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		return r, err
 	}
+	sql := fmt.Sprintf("select added_time, server, %s(value) as value from currency group by added_time, server order by added_time asc", subFunc)
 	currency := []*model.Currency{}
-	result := mysql.DB.Raw("select added_time, server, avg(value) as value from currency group by added_time, server order by added_time asc").Scan(&currency)
+	result := mysql.DB.Raw(sql).Scan(&currency)
 	if result.Error != nil {
 		return r, result.Error
 	}
