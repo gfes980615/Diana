@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Maple story 8591 幣值趨勢圖</title>
+</head>
+<body>
+    <div id="izcr" style="height:400px"></div>
+    <div id="izr" style="height:400px"></div>
+    <div id="ld" style="height:400px"></div>
+    <div id="plt" style="height:400px"></div>
+    <div id="slc" style="height:400px"></div>
+    <div id="yen" style="height:400px"></div>
+    <script src="https://echarts.baidu.com/build/dist/echarts-all.js"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('izcr'));
+        var option = {
+            title: {
+                text: '愛麗西亞 '+{{.subfunc}}+'趨勢圖'
+            },
+            xAxis: {
+                type: 'category',
+                data: {{.date}}
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            yAxis: {
+                type: 'value',
+                min:{{.ymin}},
+                max:{{.ymax}},
+                interval:10
+            },
+            series: [{
+                data: {{.izcr}},
+                type: 'line'
+            }]
+        };
+
+        myChart.setOption(option); 
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('izr'));
+        var option2 = {
+            title: {
+                text: '艾莉亞 '+{{.subfunc}}+'趨勢圖'
+            },
+            xAxis: {
+                type: 'category',
+                data: {{.date}}
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            yAxis: {
+                type: 'value',
+                min:{{.ymin}},
+                max:{{.ymax}},
+                interval:10
+            },
+            series: [{
+                data: {{.izr}},
+                type: 'line'
+            }]
+        };
+        myChart.setOption(option2); 
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('ld'));
+        var option3 = {
+            title: {
+                text: '琉德 '+{{.subfunc}}+'趨勢圖'
+            },
+            xAxis: {
+                type: 'category',
+                data: {{.date}}
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            yAxis: {
+                type: 'value',
+                min:{{.ymin}},
+                max:{{.ymax}},
+                interval:10
+            },
+            series: [{
+                data: {{.ld}},
+                type: 'line'
+            }]
+        };
+        myChart.setOption(option3); 
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('plt'));
+        var option4 = {
+            title: {
+                text: '普力特 '+{{.subfunc}}+'趨勢圖'
+            },
+            xAxis: {
+                type: 'category',
+                data: {{.date}}
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            yAxis: {
+                type: 'value',
+                min:{{.ymin}},
+                max:{{.ymax}},
+                interval:10
+            },
+            series: [{
+                data: {{.plt}},
+                type: 'line'
+            }]
+        };
+        myChart.setOption(option4); 
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('slc'));
+        var option5 = {
+            title: {
+                text: '殺人鯨 '+{{.subfunc}}+'趨勢圖'
+            },
+            xAxis: {
+                type: 'category',
+                data: {{.date}}
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            yAxis: {
+                type: 'value',
+                min:{{.ymin}},
+                max:{{.ymax}},
+                interval:10
+            },
+            series: [{
+                data: {{.slc}},
+                type: 'line'
+            }]
+        };
+        myChart.setOption(option5); 
+    </script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('yen'));
+        var option6 = {
+            title: {
+                text: '優依娜 '+{{.subfunc}}+'趨勢圖'
+            },
+            xAxis: {
+                type: 'category',
+                data: {{.date}}
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            yAxis: {
+                type: 'value',
+                min:{{.ymin}},
+                max:{{.ymax}},
+                interval:10
+            },
+            series: [{
+                data: {{.yen}},
+                type: 'line'
+            }]
+        };
+        myChart.setOption(option6); 
+    </script>
+</body>
+

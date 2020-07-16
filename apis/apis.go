@@ -55,7 +55,7 @@ func currencyChart(c *gin.Context) {
 		"ymin":    result.YMin,
 		"subfunc": category,
 	}
-	c.HTML(http.StatusOK, "echarts.html", chartData)
+	c.HTML(http.StatusOK, "maple_story.html", chartData)
 }
 
 func addCurrency(c *gin.Context) {
