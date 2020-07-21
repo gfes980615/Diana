@@ -14,6 +14,7 @@ import (
 
 const (
 	raw            = 21
+	root8591       = "https://www.8591.com.tw"
 	URL8591        = "https://www.8591.com.tw/mallList-list.html?&group=1&searchType=0&priceSort=0&ratios=0&searchGame=859&searchServer=%d&firstRow=%d"
 	regexpA        = `<a class="detail_link" href="(.*?)" target="_blank" class="goods_link" title="(.*?)" data-key="0">`
 	rCount         = `<span class="R">([0-9]+)</span>`
@@ -43,7 +44,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	// 取得所有數量
 	resultPage := getPageSource(fmt.Sprintf(URL8591, glob.MapleServerMap[mapleServer], 0), UTF8)
 	count := getAllCount(resultPage)
-	titleArray := []string{}
+	titleArray := []URLStruct{}
 	pageResult := make(chan string, count/raw+1)
 	// 取得每條商品資訊
 	for i := 0; i < count; i = i + raw {
@@ -59,7 +60,11 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 			rp := regexp.MustCompile(regexpA)
 			items := rp.FindAllStringSubmatch(tmp, -1)
 			for _, item := range items {
-				titleArray = append(titleArray, item[2])
+				title := URLStruct{
+					URL:  root8591 + item[1],
+					Name: item[2],
+				}
+				titleArray = append(titleArray, title)
 			}
 		}
 	}
@@ -68,14 +73,14 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	currencySlice := []model.Currency{}
 	for _, title := range titleArray {
 		rp := regexp.MustCompile(rCurrencyValue)
-		items := rp.FindAllStringSubmatch(title, -1)
+		items := rp.FindAllStringSubmatch(title.Name, -1)
 		var value float64
 		for _, item := range items {
 			a, _ := strconv.ParseFloat(item[1], 64)
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		currencySlice = append(currencySlice, model.Currency{Value: value, Server: mapleServer, Title: title})
+		currencySlice = append(currencySlice, model.Currency{Value: value, Server: mapleServer, Title: title.Name, URL: title.URL})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {
@@ -109,18 +114,19 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 
 // addCurrency 存入MYSQL
 func addCurrency(currencySlice []model.Currency) error {
+	// TODO: 對DB的操作移到另外的package
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		return err
 	}
+	defer mysql.Close()
 
 	for _, c := range currencySlice {
-		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`) VALUES (NOW(),?,?,?)", c.Value, c.Server, c.Title)
+		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`,`url`) VALUES (NOW(),?,?,?,?)", c.Value, c.Server, c.Title, c.URL)
 		if err.Error != nil {
 			return err.Error
 		}
 	}
-	defer mysql.Close()
 
 	return nil
 }
@@ -141,14 +147,15 @@ func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
 	if err != nil {
 		return r, err
 	}
-	sql := fmt.Sprintf("select added_time, server, %s(value) as value from currency group by added_time, server order by added_time asc", subFunc)
+	defer mysql.Close()
+
+	sql := fmt.Sprintf("SELECT `added_time`, `server`, %s(value) as `value` FROM `currency` GROUP BY `added_time`, `server` ORDER BY `added_time` ASC", subFunc)
 	currency := []*model.Currency{}
 	result := mysql.DB.Raw(sql).Scan(&currency)
 	if result.Error != nil {
 		return r, result.Error
 	}
 
-	defer mysql.Close()
 	tmpDateMap := make(map[string]bool)
 	min := currency[0].Value
 	max := currency[0].Value

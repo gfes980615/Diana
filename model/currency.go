@@ -7,6 +7,7 @@ type Currency struct {
 	Value     float64   `gorm:"column:value"`
 	Server    string    `gorm:"column:server"`
 	Title     string    `gorm:"column:title"`
+	URL       string    `gorm:"coloum:url"`
 }
 
 type ReturnSlice struct {
