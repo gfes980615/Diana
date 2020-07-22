@@ -1,11 +1,13 @@
 package line
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"regexp"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
@@ -30,13 +32,20 @@ func getAllCount(page string) int {
 
 // GetMapleCurrencyMessage ...
 func GetMapleCurrencyMessage(mapleServer string) string {
-	currencySlice, count := get8591CurrencyValueTop5(mapleServer)
-
-	message := fmt.Sprintf("85幣值前五(共 %d 筆):\n", count)
-	for i := 0; i < len(currencySlice); i++ {
-		message += fmt.Sprintf("1 : %.f萬\n", currencySlice[i])
+	value, err := getLastAvgValue()
+	if err != nil {
+		fmt.Println(err)
+		return err.Error()
 	}
-	return message
+	fmt.Println(value)
+	// currencySlice, count := get8591CurrencyValueTop5(mapleServer)
+
+	// message := fmt.Sprintf("85幣值前五(共 %d 筆):\n", count)
+	// for i := 0; i < len(currencySlice); i++ {
+	// 	message += fmt.Sprintf("1 : %.f萬\n", currencySlice[i])
+	// }
+	// return message
+	return ""
 }
 
 // get8591CurrencyValueTop5 ...
@@ -87,9 +96,14 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 		return currencySlice[i].Value > currencySlice[j].Value
 	})
 
+	avgValue, err := getLastAvgValue()
+	if err != nil {
+		return nil, 0
+	}
+
 	reuslt := []float64{}
 	if len(currencySlice) < 5 {
-		err := addCurrency(currencySlice)
+		err := addCurrency(currencySlice, avgValue)
 		if err != nil {
 			log.Println("addCurrency error: ", err)
 		}
@@ -100,7 +114,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	}
 
 	// 存入MYSQL
-	err := addCurrency(currencySlice[0:5])
+	err := addCurrency(currencySlice[0:5], avgValue)
 	if err != nil {
 		log.Println("addCurrency error: ", err)
 	}
@@ -113,7 +127,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 }
 
 // addCurrency 存入MYSQL
-func addCurrency(currencySlice []model.Currency) error {
+func addCurrency(currencySlice []model.Currency, avgValue float64) error {
 	// TODO: 對DB的操作移到另外的package
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
@@ -122,7 +136,11 @@ func addCurrency(currencySlice []model.Currency) error {
 	defer mysql.Close()
 
 	for _, c := range currencySlice {
-		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`,`url`) VALUES (NOW(),?,?,?,?)", c.Value, c.Server, c.Title, c.URL)
+		abnormal := 0
+		if c.Value >= (avgValue * 2) {
+			abnormal = 1
+		}
+		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`,`url`,`abnormal`) VALUES (NOW(),?,?,?,?,?)", c.Value, c.Server, c.Title, c.URL, abnormal)
 		if err.Error != nil {
 			return err.Error
 		}
@@ -138,6 +156,30 @@ func AddAllServerCurrency() {
 			get8591CurrencyValueTop5(server)
 		}(server)
 	}
+}
+
+func getLastAvgValue() (float64, error) {
+	mysql, err := db.NewMySQL(glob.DataBase)
+	if err != nil {
+		return 0, err
+	}
+	defer mysql.Close()
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	sql := fmt.Sprintf("SELECT avg(value) as `value` FROM `currency` where abnormal = 0 and added_time = '%s'", yesterday)
+	type tmpValue struct {
+		Value float64 `gorm:"column:value"`
+	}
+	value := []tmpValue{}
+	result := mysql.DB.Raw(sql).Scan(&value)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	if len(value) == 0 {
+		return 0, errors.New("no avg value")
+	}
+
+	return value[0].Value, nil
 }
 
 // GetMapleCurrencyChartData ...
