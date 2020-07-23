@@ -91,8 +91,7 @@ func callbackHandler(c *gin.Context) {
 					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(daily)).Do()
 					return
 				}
-				userID := event.Source.UserID
-				glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(userID+" "+event.ReplyToken)).Do()
+
 				if message.Text == "maple story" {
 					maple := line.GetMapleStoryAnnouncement()
 					glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(maple)).Do()
