@@ -13,17 +13,17 @@ import (
 )
 
 func MainApis() {
-	// router := gin.Default()
-	// router.LoadHTMLGlob("template/*")
-	// router.GET("/hello", func(c *gin.Context) {
-	// 	c.Data(200, "text/plain", []byte("Hello, It Home!"))
-	// })
-	// router.POST("/callback", callbackHandler)
-	// router.POST("/currency", addCurrency)
-	// router.GET("/currency/chart/:subfunc", currencyChart)
+	router := gin.Default()
+	router.LoadHTMLGlob("template/*")
+	router.GET("/hello", func(c *gin.Context) {
+		c.Data(200, "text/plain", []byte("Hello, It Home!"))
+	})
+	router.POST("/callback", callbackHandler)
+	router.POST("/currency", addCurrency)
+	router.GET("/currency/chart/:subfunc", currencyChart)
 
-	// router.Run()
-	line.GetMapleCurrencyMessage("izr")
+	router.Run()
+	// line.GetMapleCurrencyMessage("izr")
 }
 
 func currencyChart(c *gin.Context) {
