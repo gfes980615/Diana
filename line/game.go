@@ -32,19 +32,13 @@ func getAllCount(page string) int {
 
 // GetMapleCurrencyMessage ...
 func GetMapleCurrencyMessage(mapleServer string) string {
-	value, err := getLastAvgValue()
-	if err != nil {
-		fmt.Println(err)
-		return err.Error()
-	}
-	fmt.Println(value)
-	// currencySlice, count := get8591CurrencyValueTop5(mapleServer)
+	currencySlice, count := get8591CurrencyValueTop5(mapleServer)
 
-	// message := fmt.Sprintf("85幣值前五(共 %d 筆):\n", count)
-	// for i := 0; i < len(currencySlice); i++ {
-	// 	message += fmt.Sprintf("1 : %.f萬\n", currencySlice[i])
-	// }
-	// return message
+	message := fmt.Sprintf("85幣值前五(共 %d 筆):\n", count)
+	for i := 0; i < len(currencySlice); i++ {
+		message += fmt.Sprintf("1 : %.f萬\n", currencySlice[i])
+	}
+	return message
 	return ""
 }
 
@@ -114,7 +108,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	}
 
 	// 存入MYSQL
-	err := addCurrency(currencySlice[0:5], avgValue)
+	err = addCurrency(currencySlice[0:5], avgValue)
 	if err != nil {
 		log.Println("addCurrency error: ", err)
 	}
