@@ -12,6 +12,7 @@ import (
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/model"
+	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 const (
@@ -131,7 +132,9 @@ func addCurrency(currencySlice []model.Currency, avgValue float64) error {
 
 	for _, c := range currencySlice {
 		abnormal := 0
+		pushMessage(c.URL)
 		if c.Value >= (avgValue * 2) {
+			pushMessage(c.URL)
 			abnormal = 1
 		}
 		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`,`url`,`abnormal`) VALUES (NOW(),?,?,?,?,?)", c.Value, c.Server, c.Title, c.URL, abnormal)
@@ -185,7 +188,7 @@ func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
 	}
 	defer mysql.Close()
 
-	sql := fmt.Sprintf("SELECT `added_time`, `server`, %s(value) as `value` FROM `currency` GROUP BY `added_time`, `server` ORDER BY `added_time` ASC", subFunc)
+	sql := fmt.Sprintf("SELECT `added_time`, `server`, %s(value) as `value` FROM `currency` WHERE `abnormal` = 0 GROUP BY `added_time`, `server` ORDER BY `added_time` ASC", subFunc)
 	currency := []*model.Currency{}
 	result := mysql.DB.Raw(sql).Scan(&currency)
 	if result.Error != nil {
@@ -227,4 +230,26 @@ func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
 	r.YMin = int(min/10)*10 - 10
 
 	return r, nil
+}
+
+func pushMessage(url string) {
+	mysql, err := db.NewMySQL(glob.DataBase)
+	if err != nil {
+		log.Print(err)
+	}
+	defer mysql.Close()
+
+	sql := fmt.Sprintf("SELECT `user_id` FROM `line_user`")
+	user := []model.LineUser{}
+	userResult := mysql.DB.Raw(sql).Scan(&user)
+	if userResult.Error != nil {
+		log.Print(userResult.Error)
+	}
+
+	for _, u := range user {
+		message := "幣值異常，趕快來看看\n"
+		message += url
+		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(message)).Do()
+	}
+
 }
