@@ -85,6 +85,7 @@ func callbackHandler(c *gin.Context) {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
+				go line.SaveUserID(event.Source.UserID)
 				message.Text = strings.TrimSpace(message.Text)
 				if message.Text == "a" {
 					daily := line.GetEveryDaySentence()
