@@ -132,7 +132,6 @@ func addCurrency(currencySlice []model.Currency, avgValue float64) error {
 
 	for _, c := range currencySlice {
 		abnormal := 0
-		pushMessage(c.URL)
 		if c.Value >= (avgValue * 2) {
 			pushMessage(c.URL)
 			abnormal = 1
