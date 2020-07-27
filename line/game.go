@@ -12,7 +12,8 @@ import (
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/model"
-	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/gfes980615/Diana/repository/currency"
+	"github.com/gfes980615/Diana/repository/line_user"
 )
 
 const (
@@ -48,7 +49,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	// 取得所有數量
 	resultPage := getPageSource(fmt.Sprintf(URL8591, glob.MapleServerMap[mapleServer], 0), UTF8)
 	count := getAllCount(resultPage)
-	titleArray := []URLStruct{}
+	titleArray := []model.URLStruct{}
 	pageResult := make(chan string, count/raw+1)
 	// 取得每條商品資訊
 	for i := 0; i < count; i = i + raw {
@@ -64,7 +65,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 			rp := regexp.MustCompile(regexpA)
 			items := rp.FindAllStringSubmatch(tmp, -1)
 			for _, item := range items {
-				title := URLStruct{
+				title := model.URLStruct{
 					URL:  root8591 + item[1],
 					Name: item[2],
 				}
@@ -91,58 +92,30 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 		return currencySlice[i].Value > currencySlice[j].Value
 	})
 
-	avgValue, err := getLastAvgValue()
-	if err != nil {
-		return nil, 0
+	defaultSize := 5
+	if len(currencySlice) < defaultSize {
+		defaultSize = len(currencySlice)
 	}
-
-	reuslt := []float64{}
-	if len(currencySlice) < 5 {
-		err := addCurrency(currencySlice, avgValue)
-		if err != nil {
-			log.Println("addCurrency error: ", err)
-		}
-		for _, c := range currencySlice {
-			reuslt = append(reuslt, c.Value)
-		}
-		return reuslt, count
-	}
-
+	cResultSlice := currencySlice[0:defaultSize]
 	// 存入MYSQL
-	err = addCurrency(currencySlice[0:5], avgValue)
-	if err != nil {
-		log.Println("addCurrency error: ", err)
+	go insertCurrency(cResultSlice)
+
+	result := []float64{}
+	for _, c := range currencySlice[0:defaultSize] {
+		result = append(result, c.Value)
 	}
 
-	for _, c := range currencySlice[0:5] {
-		reuslt = append(reuslt, c.Value)
-	}
-
-	return reuslt, count
+	return result, count
 }
 
-// addCurrency 存入MYSQL
-func addCurrency(currencySlice []model.Currency, avgValue float64) error {
-	// TODO: 對DB的操作移到另外的package
-	mysql, err := db.NewMySQL(glob.DataBase)
+// 幣值異常時通知用戶
+func insertCurrency(cresult []model.Currency) {
+	lineUser := line_user.LineUserRepository{}
+	c := currency.CurrencyRepository{}
+	err := c.InsertAndWarning(cresult, lineUser.GetAllUser())
 	if err != nil {
-		return err
+		log.Println("Insert error: ", err)
 	}
-	defer mysql.Close()
-
-	for _, c := range currencySlice {
-		abnormal := 0
-		if c.Value >= (avgValue * 2) {
-			pushMessage(c.URL)
-			abnormal = 1
-		}
-		err := mysql.DB.Exec("INSERT IGNORE INTO `currency` (`added_time`,`value`,`server`,`title`,`url`,`abnormal`) VALUES (NOW(),?,?,?,?,?)", c.Value, c.Server, c.Title, c.URL, abnormal)
-		if err.Error != nil {
-			return err.Error
-		}
-	}
-
-	return nil
 }
 
 // AddAllServerCurrency 存入所有品牌幣值
@@ -229,26 +202,4 @@ func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
 	r.YMin = int(min/10)*10 - 10
 
 	return r, nil
-}
-
-func pushMessage(url string) {
-	mysql, err := db.NewMySQL(glob.DataBase)
-	if err != nil {
-		log.Print(err)
-	}
-	defer mysql.Close()
-
-	sql := fmt.Sprintf("SELECT `user_id` FROM `line_user`")
-	user := []model.LineUser{}
-	userResult := mysql.DB.Raw(sql).Scan(&user)
-	if userResult.Error != nil {
-		log.Print(userResult.Error)
-	}
-
-	for _, u := range user {
-		message := "幣值異常，趕快來看看\n"
-		message += url
-		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(message)).Do()
-	}
-
 }
