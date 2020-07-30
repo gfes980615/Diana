@@ -17,8 +17,8 @@ func (wr WebsiteRepository) Insert(url, tag string) error {
 	}
 	defer mysql.Close()
 
-	e := mysql.DB.Exec("INSERT IGNORE INTO `web_site` (`url`,`tag`,`added_time`) VALUES (?,?,NOW())", url, tag)
-	if err.Error != nil {
+	e := mysql.DB.Exec("INSERT INTO `web_site` (`url`,`tag`,`added_time`) VALUE (?,?,NOW())", url, tag)
+	if e.Error != nil {
 		return e.Error
 	}
 	return nil
