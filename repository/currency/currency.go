@@ -19,7 +19,6 @@ type CurrencyRepository struct {
 // Insert maybe can use Create()?
 // Insert 存入MYSQL
 func (cr CurrencyRepository) InsertAndWarning(currencySlice []model.Currency, users []model.LineUser) error {
-	// TODO: 對DB的操作移到另外的package
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		log.Print(err)

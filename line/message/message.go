@@ -2,9 +2,11 @@ package message
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/line"
 	"github.com/line/line-bot-sdk-go/linebot"
+	"regexp"
 	"strings"
 )
 
@@ -42,11 +44,23 @@ func eventTypeMessage(event *linebot.Event) error {
 		return nil
 	}
 
-	if _, ok := glob.MapleServerMap[message.Text]; ok {
-		currencyValue := line.GetMapleCurrencyMessage(message.Text)
+	if _, ok := glob.MapleServerMap[keyword]; ok {
+		currencyValue := line.GetMapleCurrencyMessage(keyword)
 		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(currencyValue)).Do()
 		return nil
 	}
+
+	web := strings.Split(keyword, " ")
+	if (len(web) == 2 && IsURL(web[1])) || (len(web) == 1 && IsURL((web[0]))) {
+		message := "save successful"
+		err := line.SaveWebsite(web)
+		if err != nil {
+			message = fmt.Sprintf("save failed : %v", err)
+		}
+		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message)).Do()
+		return nil
+	}
+
 	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("no work keyword")).Do()
 	// if message.Text == "maple story" {
 	// 	maple := line.GetMapleStoryAnnouncement()
@@ -66,4 +80,9 @@ func eventTypeMessage(event *linebot.Event) error {
 	//	log.Print(err)
 	//}
 	return nil
+}
+
+func IsURL(url string) bool {
+	isurl, _ := regexp.MatchString("http([s]*)://(.*?)", url)
+	return isurl
 }
