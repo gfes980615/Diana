@@ -1,0 +1,42 @@
+---
+LogConfig:
+  Name: diana
+  Env: dev
+  Level: info
+  Duration: 24h
+  HistoryPath: tmp
+  FullColor: True
+  FullTimestamp: True
+# NotifyConfig:
+#   Slack:
+#     API: https://hooks.slack.com/services/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
+#     Channel: fenrir-dev-notify
+#     Hook: false
+GINConfig:
+  Address: ":19400"
+DatabaseConfig:
+  Mysql:
+    LogMode: false
+    MaxIdle: 3
+    MaxOpen: 10
+    ConnMaxLifeMin: 15
+    DataBases:
+      - Name: agent_system
+        Address: ['10.200.252.216:3306']
+        Username: rd_report
+        Password: 'bkreport@DEV'
+        Database: agent_system
+        Enable: true
+#   Mongo:
+#     MaxIdle: 5
+#     MaxOpen: 200
+#     DataBases:
+#       - Name: agent_system
+#         Address: ['10.200.252.156:27017']
+#         Username: rd_report
+#         Password: 'bkreport@DEV'
+#         Database: agent_system
+#         Enable: true
+# ConsumerConfig:
+#   Brokers: ['10.200.252.180:9092','10.200.252.181:9092','10.200.252.182:9092']
+#   Increment: "v1.0.0"

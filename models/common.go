@@ -1,4 +1,4 @@
-package model
+package models
 
 type URLStruct struct {
 	Name string

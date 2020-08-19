@@ -1,4 +1,4 @@
-package model
+package models
 
 // DataBaseConfig ...
 type DataBaseConfig struct {

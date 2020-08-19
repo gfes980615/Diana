@@ -8,7 +8,7 @@ import (
 
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
-	"github.com/gfes980615/Diana/model"
+	"github.com/gfes980615/Diana/models"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -18,7 +18,7 @@ type CurrencyRepository struct {
 
 // Insert maybe can use Create()?
 // Insert 存入MYSQL
-func (cr CurrencyRepository) InsertAndWarning(currencySlice []model.Currency, users []model.LineUser) error {
+func (cr CurrencyRepository) InsertAndWarning(currencySlice []models.Currency, users []models.LineUser) error {
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		log.Print(err)
@@ -55,7 +55,7 @@ func (cr CurrencyRepository) GetChartData(subFunc string) ([]model.Currency, err
 	defer mysql.Close()
 
 	sql := fmt.Sprintf("SELECT `added_time`, `server`, %s(value) as `value` FROM `currency` WHERE `abnormal` = 0 GROUP BY `added_time`, `server` ORDER BY `added_time` ASC", subFunc)
-	currency := []model.Currency{}
+	currency := []models.Currency{}
 	result := mysql.DB.Raw(sql).Scan(&currency)
 	if result.Error != nil {
 		return nil, result.Error
@@ -69,7 +69,7 @@ func (cr CurrencyRepository) getLastDayAvgValue(mysql *db.MySQL) (float64, error
 	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 	sql := fmt.Sprintf("SELECT avg(value) as `value` FROM `currency` where `abnormal` = 0 AND `added_time` = '%s'", yesterday)
 
-	value := []model.Currency{}
+	value := []models.Currency{}
 	result := mysql.DB.Raw(sql).Scan(&value)
 	if result.Error != nil {
 		log.Print(result.Error)
