@@ -13,15 +13,17 @@ LogConfig:
 #     Channel: fenrir-dev-notify
 #     Hook: false
 GINConfig:
-  Address: ":8080"
+  Address: ":19400"
 DatabaseConfig:
   Mysql:
     LogMode: false
     MaxIdle: 3
     MaxOpen: 10
     ConnMaxLifeMin: 15
-    Name: diana
-    Address: 127.0.0.1:3306
-    Username: ltscyt0717
-    Password: bkreport@DEV
-    Database: diana
+    DataBases:
+      Name: diana
+      Address: '127.0.0.1:3306'
+      Username: rd_report
+      Password: 'bkreport@DEV'
+      Database: diana
+      Enable: true
