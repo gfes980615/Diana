@@ -11,7 +11,7 @@ import (
 
 	"github.com/axgle/mahonia"
 	"github.com/gfes980615/Diana/glob"
-	"github.com/gfes980615/Diana/model"
+	"github.com/gfes980615/Diana/models"
 )
 
 const (
@@ -61,13 +61,13 @@ func getRandomNumber(number int) int {
 	return rand.Int() % number
 }
 
-func setURL(url string, regex string, code string) []model.URLStruct {
-	subURL := []model.URLStruct{}
+func setURL(url string, regex string, code string) []models.URLStruct {
+	subURL := []models.URLStruct{}
 	result := getPageSource(url, code)
 	rp := regexp.MustCompile(regex)
 	items := rp.FindAllStringSubmatch(result, -1)
 	for _, item := range items {
-		tmp := model.URLStruct{Name: item[2], URL: item[1]}
+		tmp := models.URLStruct{Name: item[2], URL: item[1]}
 		subURL = append(subURL, tmp)
 	}
 

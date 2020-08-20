@@ -3,17 +3,22 @@ package main
 import (
 	"log"
 
-	"github.com/gfes980615/Diana/apis"
+	"github.com/gfes980615/Diana/server"
 )
 
 func main() {
-
 	defer func() {
-		if rc := recover(); rc != nil {
-			log.Printf("panic:\n%v\n", rc)
+		log.Error("Server shutdown...")
+		if err := recover(); err != nil {
+			log.Errorf("error: %v", err)
 		}
 	}()
 
-	apis.MainApis() // gin
+	ErrExit(server.Run())
+}
 
+func ErrExit(err error) {
+	if err != nil {
+		// log.Error(err)
+	}
 }

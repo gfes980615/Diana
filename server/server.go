@@ -32,9 +32,6 @@ func Run() error {
 		config.Config.LogConfig.Level,
 		config.Config.LogConfig.HistoryPath,
 		config.Config.LogConfig.Duration,
-		// config.Config.NotifyConfig.Slack.API,
-		// config.Config.NotifyConfig.Slack.Channel,
-		// config.Config.NotifyConfig.Slack.Hook,
 		config.Config.LogConfig.FullColor,
 		config.Config.LogConfig.FullTimestamp)
 
@@ -42,17 +39,9 @@ func Run() error {
 		return err
 	}
 
-	//if err := db.InitMongo(config.Config.DatabaseConfig.Mongo); err != nil {
-	//	return err
-	//}
-
 	if err := injection.InitInject(); err != nil {
 		return err
 	}
-
-	//if err := listener.InitListener(config.Config.ConsumerConfig.Brokers); err != nil {
-	//	return err
-	//}
 
 	if router, err := controller.InitController(); err != nil {
 		return err
@@ -71,4 +60,5 @@ func run(router *gin.Engine, stop chan error) {
 	if err := router.Run(config.Config.GINConfig.Address); err != nil {
 		stop <- errors.New(" Doesn't has valid port. ")
 	}
+	router.LoadHTMLGlob("template/*")
 }

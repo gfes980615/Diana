@@ -11,7 +11,7 @@ import (
 
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
-	"github.com/gfes980615/Diana/model"
+	"github.com/gfes980615/Diana/models"
 	"github.com/gfes980615/Diana/repository/currency"
 	"github.com/gfes980615/Diana/repository/line_user"
 )
@@ -49,7 +49,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	// 取得所有數量
 	resultPage := getPageSource(fmt.Sprintf(URL8591, glob.MapleServerMap[mapleServer], 0), UTF8)
 	count := getAllCount(resultPage)
-	titleArray := []model.URLStruct{}
+	titleArray := []models.URLStruct{}
 	pageResult := make(chan string, count/raw+1)
 	// 取得每條商品資訊
 	for i := 0; i < count; i = i + raw {
@@ -65,7 +65,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 			rp := regexp.MustCompile(regexpA)
 			items := rp.FindAllStringSubmatch(tmp, -1)
 			for _, item := range items {
-				title := model.URLStruct{
+				title := models.URLStruct{
 					URL:  root8591 + item[1],
 					Name: item[2],
 				}
@@ -75,7 +75,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 	}
 
 	// 將幣值取出，string -> float 存成 array
-	currencySlice := []model.Currency{}
+	currencySlice := []models.Currency{}
 	for _, title := range titleArray {
 		rp := regexp.MustCompile(rCurrencyValue)
 		items := rp.FindAllStringSubmatch(title.Name, -1)
@@ -85,7 +85,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		currencySlice = append(currencySlice, model.Currency{Value: value, Server: mapleServer, Title: title.Name, URL: title.URL})
+		currencySlice = append(currencySlice, models.Currency{Value: value, Server: mapleServer, Title: title.Name, URL: title.URL})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {
@@ -109,7 +109,7 @@ func get8591CurrencyValueTop5(mapleServer string) ([]float64, int) {
 }
 
 // 幣值異常時通知用戶
-func insertCurrency(cresult []model.Currency) {
+func insertCurrency(cresult []models.Currency) {
 	lineUser := line_user.LineUserRepository{}
 	c := currency.CurrencyRepository{}
 	err := c.InsertAndWarning(cresult, lineUser.GetAllUser())
@@ -152,8 +152,8 @@ func getLastAvgValue() (float64, error) {
 }
 
 // GetMapleCurrencyChartData ...
-func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
-	r := model.ReturnSlice{}
+func GetMapleCurrencyChartData(subFunc string) (models.ReturnSlice, error) {
+	r := models.ReturnSlice{}
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		return r, err
@@ -161,7 +161,7 @@ func GetMapleCurrencyChartData(subFunc string) (model.ReturnSlice, error) {
 	defer mysql.Close()
 
 	sql := fmt.Sprintf("SELECT `added_time`, `server`, %s(value) as `value` FROM `currency` WHERE `abnormal` = 0 GROUP BY `added_time`, `server` ORDER BY `added_time` ASC", subFunc)
-	currency := []*model.Currency{}
+	currency := []*models.Currency{}
 	result := mysql.DB.Raw(sql).Scan(&currency)
 	if result.Error != nil {
 		return r, result.Error

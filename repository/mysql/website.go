@@ -1,9 +1,10 @@
-package website
+package mysql
 
 import (
+	"log"
+
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
-	"log"
 )
 
 type WebsiteRepository struct {

@@ -4,14 +4,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/gfes980615/Diana/model"
+	"github.com/gfes980615/Diana/models"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 var (
 	ChannelSecret      string
 	ChannelAccessToken string
-	DataBase           model.DataBaseConfig
+	DataBase           models.DataBaseConfig
 )
 
 func init() {

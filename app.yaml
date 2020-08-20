@@ -13,30 +13,15 @@ LogConfig:
 #     Channel: fenrir-dev-notify
 #     Hook: false
 GINConfig:
-  Address: ":19400"
+  Address: ":8080"
 DatabaseConfig:
   Mysql:
     LogMode: false
     MaxIdle: 3
     MaxOpen: 10
     ConnMaxLifeMin: 15
-    DataBases:
-      - Name: agent_system
-        Address: ['10.200.252.216:3306']
-        Username: rd_report
-        Password: 'bkreport@DEV'
-        Database: agent_system
-        Enable: true
-#   Mongo:
-#     MaxIdle: 5
-#     MaxOpen: 200
-#     DataBases:
-#       - Name: agent_system
-#         Address: ['10.200.252.156:27017']
-#         Username: rd_report
-#         Password: 'bkreport@DEV'
-#         Database: agent_system
-#         Enable: true
-# ConsumerConfig:
-#   Brokers: ['10.200.252.180:9092','10.200.252.181:9092','10.200.252.182:9092']
-#   Increment: "v1.0.0"
+    Name: diana
+    Address: 127.0.0.1:3306
+    Username: ltscyt0717
+    Password: bkreport@DEV
+    Database: diana

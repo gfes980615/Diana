@@ -6,7 +6,7 @@ import (
 
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
-	"github.com/gfes980615/Diana/model"
+	"github.com/gfes980615/Diana/models"
 )
 
 // SaveUserID TODO 需要再想想看怎麼寫比較好
@@ -18,7 +18,7 @@ func SaveUserID(id string) {
 	defer mysql.Close()
 
 	sql := fmt.Sprintf("SELECT `user_id` FROM `line_user` WHERE `user_id` = '%s'", id)
-	user := []model.LineUser{}
+	user := []models.LineUser{}
 	userResult := mysql.DB.Raw(sql).Scan(&user)
 	if userResult.Error != nil {
 		log.Print(userResult.Error)

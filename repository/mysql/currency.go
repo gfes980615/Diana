@@ -1,4 +1,4 @@
-package currency
+package mysql
 
 import (
 	"errors"
@@ -9,16 +9,17 @@ import (
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/models"
+	"github.com/gfes980615/Diana/models/po"
+	"github.com/jinzhu/gorm"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
-// CurrencyRepository ...
-type CurrencyRepository struct {
+type currencyRepository struct {
 }
 
 // Insert maybe can use Create()?
 // Insert 存入MYSQL
-func (cr CurrencyRepository) InsertAndWarning(currencySlice []models.Currency, users []models.LineUser) error {
+func (cr currencyRepository) InsertAndWarning(DB *gorm.DB, currencySlice []po.Currency, users []po.LineUser) error {
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		log.Print(err)

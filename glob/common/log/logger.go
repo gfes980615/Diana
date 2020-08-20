@@ -41,18 +41,18 @@ var logExit = make(chan error)
 var wg sync.WaitGroup
 
 // Init ...
-func Init(env, level, logpath, duration, forceColor, fullTimestamp bool) {
+func Init(env, level, logpath, duration, url, channel string, hook, forceColor, fullTimestamp bool) {
 	lv, _ := logrus.ParseLevel(level)
 
 	format := &logrus.TextFormatter{ForceColors: forceColor, FullTimestamp: fullTimestamp}
 
 	switch env {
 	case "dev":
-		InitLog(format, lv, env, logpath, duration, true, true)
+		InitLog(format, lv, env, logpath, duration, url, channel, hook, true, true)
 	case "uat":
-		InitLog(format, lv, env, logpath, duration, false, true)
+		InitLog(format, lv, env, logpath, duration, url, channel, hook, false, true)
 	case "prod":
-		InitLog(format, lv, env, logpath, duration, false, true)
+		InitLog(format, lv, env, logpath, duration, url, channel, hook, false, true)
 	}
 }
 

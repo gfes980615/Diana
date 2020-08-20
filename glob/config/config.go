@@ -78,12 +78,12 @@ type DatabaseConfig struct {
 
 // DataBases
 type DataBases struct {
-	Database string   `yaml:"Database"`
-	Enable   bool     `yaml:"Enable"`
-	Name     string   `yaml:"Name"`
-	Address  []string `yaml:"Address"`
-	Username string   `yaml:"Username"`
-	Password string   `yaml:"Password"`
+	Database string `yaml:"Database"`
+	Enable   bool   `yaml:"Enable"`
+	Name     string `yaml:"Name"`
+	Address  string `yaml:"Address"`
+	Username string `yaml:"Username"`
+	Password string `yaml:"Password"`
 }
 
 // LogConfig
@@ -104,11 +104,11 @@ type GINConfig struct {
 
 // Mysql
 type Mysql struct {
-	MaxIdle        int         `yaml:"MaxIdle"`
-	MaxOpen        int         `yaml:"MaxOpen"`
-	ConnMaxLifeMin int         `yaml:"ConnMaxLifeMin"`
-	DataBases      []DataBases `yaml:"DataBases"`
-	LogMode        bool        `yaml:"LogMode"`
+	MaxIdle        int       `yaml:"MaxIdle"`
+	MaxOpen        int       `yaml:"MaxOpen"`
+	ConnMaxLifeMin int       `yaml:"ConnMaxLifeMin"`
+	DataBases      DataBases `yaml:"DataBases"`
+	LogMode        bool      `yaml:"LogMode"`
 }
 
 // // Mongo
