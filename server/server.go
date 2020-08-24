@@ -32,6 +32,9 @@ func Run() error {
 		config.Config.LogConfig.Level,
 		config.Config.LogConfig.HistoryPath,
 		config.Config.LogConfig.Duration,
+		"",
+		"",
+		false,
 		config.Config.LogConfig.FullColor,
 		config.Config.LogConfig.FullTimestamp)
 

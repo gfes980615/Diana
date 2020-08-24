@@ -4,5 +4,5 @@ import "github.com/line/line-bot-sdk-go/linebot"
 
 // LineService ...
 type LineService interface {
-	ReplyMessage(events []*linebot.Event)
+	ReplyMessage(events []*linebot.Event) error
 }

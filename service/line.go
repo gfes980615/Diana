@@ -19,7 +19,7 @@ func init() {
 type lineService struct {
 }
 
-func (ls *lineService) ReplyMessage(events []*linebot.Event) {
+func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 	if len(events) != 1 {
 		errMessage := "except error"
 		return errors.New(errMessage)
@@ -29,12 +29,12 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) {
 	go line.SaveUserID(event.Source.UserID)
 	switch event.Type {
 	case linebot.EventTypeMessage:
-		err = eventTypeMessage(event)
+		err = ls.eventTypeMessage(event)
 	}
 	return err
 }
 
-func eventTypeMessage(event *linebot.Event) error {
+func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 	message, ok := event.Message.(*linebot.TextMessage)
 	if !ok {
 		errMessage := "message type is not linebot.TextMessage"

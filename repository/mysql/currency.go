@@ -17,6 +17,16 @@ import (
 type currencyRepository struct {
 }
 
+func (cr *currencyRepository) Insert(DB *gorm.DB, currencySlice []*po.Currency) error {
+	for _, cur := range currencySlice {
+		err := DB.Table("currency").Create(cur).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Insert maybe can use Create()?
 // Insert 存入MYSQL
 func (cr currencyRepository) InsertAndWarning(DB *gorm.DB, currencySlice []po.Currency, users []po.LineUser) error {
@@ -48,7 +58,7 @@ func (cr currencyRepository) InsertAndWarning(DB *gorm.DB, currencySlice []po.Cu
 	return nil
 }
 
-func (cr CurrencyRepository) GetChartData(subFunc string) ([]model.Currency, error) {
+func (cr currencyRepository) GetChartData(subFunc string) ([]model.Currency, error) {
 	mysql, err := db.NewMySQL(glob.DataBase)
 	if err != nil {
 		return nil, err
@@ -65,25 +75,25 @@ func (cr CurrencyRepository) GetChartData(subFunc string) ([]model.Currency, err
 	return currency, nil
 }
 
-// getLastDayAvgValue 取得前一日平均幣值
-func (cr CurrencyRepository) getLastDayAvgValue(mysql *db.MySQL) (float64, error) {
-	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
-	sql := fmt.Sprintf("SELECT avg(value) as `value` FROM `currency` where `abnormal` = 0 AND `added_time` = '%s'", yesterday)
-
-	value := []models.Currency{}
-	result := mysql.DB.Raw(sql).Scan(&value)
-	if result.Error != nil {
-		log.Print(result.Error)
-		return 0, result.Error
-	}
-
-	if len(value) == 0 {
-		log.Print(errors.New("no avg value"))
-		return 0, errors.New("no avg value")
-	}
-
-	return value[0].Value, nil
-}
+//// getLastDayAvgValue 取得前一日平均幣值
+//func (cr currencyRepository) getLastDayAvgValue(mysql *db.MySQL) (float64, error) {
+//	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+//	sql := fmt.Sprintf("SELECT avg(value) as `value` FROM `currency` where `abnormal` = 0 AND `added_time` = '%s'", yesterday)
+//
+//	value := []models.Currency{}
+//	result := mysql.DB.Raw(sql).Scan(&value)
+//	if result.Error != nil {
+//		log.Print(result.Error)
+//		return 0, result.Error
+//	}
+//
+//	if len(value) == 0 {
+//		log.Print(errors.New("no avg value"))
+//		return 0, errors.New("no avg value")
+//	}
+//
+//	return value[0].Value, nil
+//}
 
 func pushAbnormalCurrency(url string, users []model.LineUser) {
 	for _, u := range users {
@@ -91,4 +101,17 @@ func pushAbnormalCurrency(url string, users []model.LineUser) {
 		message += url
 		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(message)).Do()
 	}
+}
+
+// getLastDayAvgValue 取得前一日平均幣值
+func (cr currencyRepository) GetLastDayAvgValue(DB *gorm.DB, mysql *db.MySQL) (float64, error) {
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+
+	value := &po.Currency{}
+	err := DB.Table("currency").Select("AVG(`amount`) AS `value`").Where("`abnormal` = ? AND `added_time` = ?", 0, yesterday).Take(value).Error
+	if err != nil {
+		return 0, nil
+	}
+
+	return value.Value, nil
 }
