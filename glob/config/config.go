@@ -1,6 +1,8 @@
 package config
 
 import (
+	"github.com/gfes980615/Diana/glob"
+	"github.com/line/line-bot-sdk-go/linebot"
 	"log"
 	"os"
 
@@ -9,11 +11,16 @@ import (
 
 // Config ...
 var (
-	Config *ConfigSetup
+	Config             *ConfigSetup
+	ChannelSecret      string
+	ChannelAccessToken string
 )
 
 func init() {
 	InitConfig()
+
+	initEnvConfig()
+	initLineBot()
 }
 
 // LoadConfig ...
@@ -43,10 +50,21 @@ func InitConfig() {
 	LoadConfig("app.yaml")
 }
 
+func initEnvConfig() {
+	ChannelSecret = Config.NotifyConfig.Line.ChannelSecret
+	ChannelAccessToken = Config.NotifyConfig.Line.ChannelAccessToken
+}
+
+func initLineBot() {
+	var err error
+	glob.Bot, err = linebot.New(ChannelSecret, ChannelAccessToken)
+	log.Println("Bot:", glob.Bot, " err:", err)
+}
+
 // ConfigSetup
 type ConfigSetup struct {
-	LogConfig LogConfig `yaml:"LogConfig"`
-	// NotifyConfig   NotifyConfig   `yaml:"NotifyConfig"`
+	LogConfig      LogConfig      `yaml:"LogConfig"`
+	NotifyConfig   NotifyConfig   `yaml:"NotifyConfig"`
 	GINConfig      GINConfig      `yaml:"GINConfig"`
 	DatabaseConfig DatabaseConfig `yaml:"DatabaseConfig"`
 	// ConsumerConfig ConsumerConfig `yaml:"ConsumerConfig"`
@@ -58,10 +76,16 @@ type ConfigSetup struct {
 // 	Increment string   `yaml:"Increment"`
 // }
 
-// // NotifyConfig
-// type NotifyConfig struct {
-// 	Slack Slack `yaml:"Slack"`
-// }
+// NotifyConfig
+type NotifyConfig struct {
+	//Slack Slack `yaml:"Slack"`
+	Line Line `yaml:"Line"`
+}
+
+type Line struct {
+	ChannelSecret      string `yaml:"ChannelSecret"`
+	ChannelAccessToken string `yaml:"ChannelAccessToken"`
+}
 
 // // Slack
 // type Slack struct {

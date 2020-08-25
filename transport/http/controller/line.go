@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/gfes980615/Diana/transport/http/common"
 	"log"
 
 	"github.com/gfes980615/Diana/service"
@@ -16,11 +17,13 @@ func init() {
 }
 
 type LineController struct {
-	lineService service.LineService `injection:"lineService"`
+	lineService   service.LineService   `injection:"lineService"`
+	spiderService service.SpiderService `injection:"spiderService"`
 }
 
-func (ctl *LineController) SetupRouter(router *gin.Engine) {
-	router.GET("/callback", ctl.callbackHandler)
+func (lc *LineController) SetupRouter(router *gin.Engine) {
+	router.GET("/callback", lc.callbackHandler)
+	router.GET("/daily/sentence", lc.Daily)
 }
 
 func (lc *LineController) callbackHandler(ctx *gin.Context) {
@@ -30,4 +33,8 @@ func (lc *LineController) callbackHandler(ctx *gin.Context) {
 		return
 	}
 	lc.lineService.ReplyMessage(events)
+}
+
+func (lc *LineController) Daily(ctx *gin.Context) {
+	common.Send(ctx, lc.spiderService.GetEveryDaySentence())
 }

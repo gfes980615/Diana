@@ -2,18 +2,17 @@
 LogConfig:
   Name: diana
   Env: dev
-  Level: info
+  Level: debug
   Duration: 24h
   HistoryPath: tmp
   FullColor: True
   FullTimestamp: True
-# NotifyConfig:
-#   Slack:
-#     API: https://hooks.slack.com/services/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
-#     Channel: fenrir-dev-notify
-#     Hook: false
+NotifyConfig:
+  Line:
+    ChannelSecret: b8c89a810644c31225f141eb7313254f
+    ChannelAccessToken: JkYktojuG2C6BykjnLQ6znoqOGLMq2CYaPSpgumSyaFjSrK0+Dtl6KFnpLekIW9fYXeFmq6obaLdpTrvXX735gv86OV2d61AViIEV89Q4nLkvi2DHjyDqgcttEIAvpFGPKwd+K+vbocRE0/nxOueMQdB04t89/1O/w1cDnyilFU=
 GINConfig:
-  Address: ":19400"
+  Address: ":8080"
 DatabaseConfig:
   Mysql:
     LogMode: false
@@ -23,7 +22,7 @@ DatabaseConfig:
     DataBases:
       Name: diana
       Address: '127.0.0.1:3306'
-      Username: rd_report
-      Password: 'bkreport@DEV'
+      Username: root
+      Password: '1qaz!QAZ'
       Database: diana
       Enable: true

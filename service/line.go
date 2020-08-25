@@ -2,7 +2,8 @@ package service
 
 import (
 	"errors"
-	"fmt"
+	"github.com/gfes980615/Diana/db"
+	"github.com/gfes980615/Diana/repository/mysql"
 	"regexp"
 	"strings"
 
@@ -17,6 +18,8 @@ func init() {
 }
 
 type lineService struct {
+	currencyService    CurrencyService          `injection:"currencyService"`
+	lineUserRepository mysql.LineUserRepository `injection:"lineUserRepository"`
 }
 
 func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
@@ -26,7 +29,10 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 	}
 	var err error
 	event := events[0]
-	go line.SaveUserID(event.Source.UserID)
+
+	DB := db.MysqlConn.Session()
+	go ls.lineUserRepository.Create(DB, event.Source.UserID)
+
 	switch event.Type {
 	case linebot.EventTypeMessage:
 		err = ls.eventTypeMessage(event)
@@ -54,21 +60,21 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 	}
 
 	if _, ok := glob.MapleServerMap[keyword]; ok {
-		currencyValue := line.GetMapleCurrencyMessage(keyword)
+		currencyValue := ls.currencyService.GetMapleCurrencyMessage(keyword)
 		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(currencyValue)).Do()
 		return nil
 	}
 
-	web := strings.Split(keyword, " ")
-	if (len(web) == 2 && IsURL(web[1])) || (len(web) == 1 && IsURL((web[0]))) {
-		message := "save successful"
-		err := line.SaveWebsite(web)
-		if err != nil {
-			message = fmt.Sprintf("save failed : %v", err)
-		}
-		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message)).Do()
-		return nil
-	}
+	//web := strings.Split(keyword, " ")
+	//if (len(web) == 2 && IsURL(web[1])) || (len(web) == 1 && IsURL((web[0]))) {
+	//	message := "save successful"
+	//	err := line.SaveWebsite(web)
+	//	if err != nil {
+	//		message = fmt.Sprintf("save failed : %v", err)
+	//	}
+	//	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message)).Do()
+	//	return nil
+	//}
 
 	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("no work keyword")).Do()
 	// if message.Text == "maple story" {

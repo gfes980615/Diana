@@ -1,34 +1,38 @@
 package mysql
 
 import (
-	"fmt"
-	"log"
-
-	"github.com/gfes980615/Diana/db"
-	"github.com/gfes980615/Diana/glob"
-	"github.com/gfes980615/Diana/models"
+	"github.com/gfes980615/Diana/glob/common/log"
+	"github.com/gfes980615/Diana/injection"
+	"github.com/gfes980615/Diana/models/po"
+	"github.com/jinzhu/gorm"
+	"time"
 )
 
-type LineUserRepository struct {
+func init() {
+	injection.AutoRegister(&lineUserRepository{})
+}
+
+type lineUserRepository struct {
 }
 
 // GetAllUser ...
-func (lr LineUserRepository) GetAllUser() []models.LineUser {
-	mysql, err := db.NewMySQL(glob.DataBase)
+func (lr *lineUserRepository) GetAllUser(DB *gorm.DB) ([]*po.LineUser, error) {
+	users := []*po.LineUser{}
+
+	err := DB.Table("line_user").Find(&users).Error
 	if err != nil {
-		log.Print(err)
-		return nil
-	}
-	defer mysql.Close()
-
-	sql := fmt.Sprintf("SELECT `user_id` FROM `line_user`")
-
-	user := []models.LineUser{}
-	userResult := mysql.DB.Raw(sql).Scan(&user)
-	if userResult.Error != nil {
-		log.Print(userResult.Error)
-		return nil
+		return nil, err
 	}
 
-	return user
+	return users, nil
+}
+
+func (lr *lineUserRepository) Create(DB *gorm.DB, id string) {
+	user := &po.LineUser{
+		UserID:    id,
+		AddedTime: time.Now(),
+	}
+	err := DB.Table("line_user").Create(user).Error
+	log.Println(err)
+	return
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"github.com/gfes980615/Diana/glob/common/log"
 
 	"github.com/gfes980615/Diana/server"
 )

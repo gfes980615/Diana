@@ -8,7 +8,8 @@ type Currency struct {
 	Value     float64   `gorm:"column:value"`
 	Server    string    `gorm:"column:server"`
 	Title     string    `gorm:"column:title"`
-	URL       string    `gorm:"coloum:url"`
+	URL       string    `gorm:"column:url"`
+	Abnormal  int       `gorm:"column:abnormal"`
 }
 
 // LineUser ...
