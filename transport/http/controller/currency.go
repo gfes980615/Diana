@@ -17,6 +17,7 @@ type CurrencyController struct {
 }
 
 func (ctl *CurrencyController) SetupRouter(router *gin.Engine) {
+	router.LoadHTMLGlob("template/*")
 	controller := router.Group("/diana")
 	controller.GET("/currency/chart", ctl.currencyChart)
 	controller.GET("/currency/value", ctl.currencyValue)

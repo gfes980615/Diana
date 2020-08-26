@@ -38,7 +38,7 @@ type spiderService struct {
 func (s *spiderService) GetPageSource(url string, code string) string {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Http get err:", err)

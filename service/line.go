@@ -9,7 +9,6 @@ import (
 
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/injection"
-	"github.com/gfes980615/Diana/line"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -19,6 +18,7 @@ func init() {
 
 type lineService struct {
 	currencyService    CurrencyService          `injection:"currencyService"`
+	spiderService      SpiderService            `injection:"spiderService"`
 	lineUserRepository mysql.LineUserRepository `injection:"lineUserRepository"`
 }
 
@@ -49,7 +49,7 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 
 	keyword := strings.TrimSpace(message.Text)
 	if keyword == "a" {
-		daily := line.GetEveryDaySentence()
+		daily := ls.spiderService.GetEveryDaySentence()
 		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(daily)).Do()
 		return nil
 	}

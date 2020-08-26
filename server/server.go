@@ -63,5 +63,4 @@ func run(router *gin.Engine, stop chan error) {
 	if err := router.Run(config.Config.GINConfig.Address); err != nil {
 		stop <- errors.New(" Doesn't has valid port. ")
 	}
-	router.LoadHTMLGlob("template/*")
 }
