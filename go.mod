@@ -14,9 +14,10 @@ require (
 	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/line/line-bot-sdk-go v7.4.0+incompatible
+	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/sirupsen/logrus v1.6.0
-	github.com/spf13/viper v1.7.1
+	github.com/spf13/viper v1.5.0
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	gorm.io/driver/mysql v1.0.1
 	gorm.io/gorm v1.20.1

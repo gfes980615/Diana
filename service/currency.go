@@ -189,7 +189,9 @@ func (cs *currencyService) get8591CurrencyValueTop5(mapleServer string) ([]float
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: mapleServer, Title: title.Name, URL: title.URL})
+		name := removeExtraChar(title.Name)
+		url := replaceQuestionMark(title.URL)
+		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: mapleServer, Title: name, URL: url})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {

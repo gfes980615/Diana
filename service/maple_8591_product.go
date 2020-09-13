@@ -85,3 +85,11 @@ func removeExtraChar(title string) string {
 	}
 	return string(s)
 }
+
+func replaceQuestionMark(url string) string {
+	return strings.Replace(url, "?", "^", 1)
+}
+
+func recoverQuestionMark(url string) string {
+	return strings.Replace(url, "^", "?", 1)
+}
