@@ -14,7 +14,7 @@ type Currency struct {
 
 // LineUser ...
 type LineUser struct {
-	UserID    string    `gorm:"column:user_id"`
+	UserID string `gorm:"column:user_id"`
 	//AddedTime time.Time `gorm:"column:added_time"`
 }
 
@@ -36,4 +36,15 @@ type Maple8591Product struct {
 
 func (mp Maple8591Product) TableName() string {
 	return "maple_product"
+}
+
+type Activity struct {
+	Title             string
+	URL               string
+	Introduction      string
+	Category          string
+	CreateTime        string
+	TicketStatus      string
+	ParticipateNumber string
+	ActivityTime      string
 }

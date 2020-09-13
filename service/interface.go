@@ -24,3 +24,7 @@ type SpiderService interface {
 type Maple8591ProductService interface {
 	Get8591AllProduct()
 }
+
+type ActivityService interface {
+	GetKktixActivity()
+}
