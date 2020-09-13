@@ -15,7 +15,6 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -39,7 +38,7 @@ type currencyService struct {
 }
 
 func (cs *currencyService) GetMapleCurrencyMessage(mapleServer string) string {
-	currencySlice, count := cs.get8591CurrencyValueTop5(mapleServer)
+	currencySlice, count := cs.get8591CurrencyValueTop5V2(mapleServer)
 
 	message := fmt.Sprintf("%s\n85幣值前五(共 %d 筆):\n", mapleServer, count)
 	for i := 0; i < len(currencySlice); i++ {
@@ -62,16 +61,14 @@ func (cs *currencyService) get8591CurrencyValueTop5V2(mapleServer string) ([]flo
 
 	c.OnHTML("ul#wc_list.clearfix > li", func(e *colly.HTMLElement) {
 		url := e.ChildAttr("div > a.detail_link", "href")
-		url = strings.Replace(url, "?", "#", 1)
 		if _, ok := urlMap[url]; ok {
 			return
 		} else {
 			urlMap[url] = true
 		}
 
-		title := e.ChildText("div > a.detail_link > span.ml-item-title")
 		tmp := &po.Maple8591Product{
-			Title:     title,
+			Title:     e.ChildText("div > a.detail_link > span.ml-item-title"),
 			URL:       url,
 			Pageviews: e.ChildText("div.creatTime > span.ListHour"),
 		}
@@ -138,7 +135,7 @@ func (cs *currencyService) setProductToCurrency(products []*po.Maple8591Product)
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: product.Title, URL: product.URL})
+		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: removeExtraChar(product.Title), URL: replaceQuestionMark(product.URL)})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {
