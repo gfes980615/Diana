@@ -239,7 +239,7 @@ func (cs currencyService) insertAndWarning(currencySlice []*po.Currency, users [
 	for _, c := range currencySlice {
 		abnormal := 0
 		if c.Value >= (avgValue * 2) {
-			cs.pushAbnormalCurrency(c.URL, users)
+			cs.pushAbnormalCurrency(c, users)
 			abnormal = 1
 		}
 		c.Abnormal = abnormal
@@ -254,11 +254,12 @@ func (cs currencyService) insertAndWarning(currencySlice []*po.Currency, users [
 	return nil
 }
 
-func (cs currencyService) pushAbnormalCurrency(url string, users []*po.LineUser) {
+func (cs currencyService) pushAbnormalCurrency(product *po.Currency, users []*po.LineUser) {
+	messageFormat := "%s:幣值異常\n%s"
+	replyMessage := fmt.Sprintf(messageFormat, product.Server, product.URL)
+
 	for _, u := range users {
-		message := "幣值異常，趕快來看看\n"
-		message += url
-		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(message)).Do()
+		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(replyMessage)).Do()
 	}
 }
 

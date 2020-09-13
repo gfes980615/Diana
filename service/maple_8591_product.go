@@ -79,7 +79,7 @@ func (mp *maple8591ProductService) Get8591AllProduct() {
 func removeExtraChar(title string) string {
 	var s []int32
 	for _, t := range title {
-		if unicode.Is(unicode.Han, t) {
+		if unicode.Is(unicode.Han, t) || unicode.IsDigit(t) || unicode.IsLetter(t) {
 			s = append(s, t)
 		}
 	}
