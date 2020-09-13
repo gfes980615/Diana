@@ -9,11 +9,13 @@ import (
 	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/gfes980615/Diana/repository/mysql"
+	"github.com/gocolly/colly"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"log"
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -44,6 +46,106 @@ func (cs *currencyService) GetMapleCurrencyMessage(mapleServer string) string {
 		message += fmt.Sprintf("1 : %.f萬\n", currencySlice[i])
 	}
 	return message
+	//cs.get8591CurrencyValueTop5V2(mapleServer)
+
+	//return ""
+}
+
+func (cs *currencyService) get8591CurrencyValueTop5V2(mapleServer string) ([]float64, int) {
+	products := []*po.Maple8591Product{}
+
+	urlMap := make(map[string]bool)
+
+	c := colly.NewCollector(
+		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)"),
+	)
+
+	c.OnHTML("ul#wc_list.clearfix > li", func(e *colly.HTMLElement) {
+		url := e.ChildAttr("div > a.detail_link", "href")
+		url = strings.Replace(url, "?", "#", 1)
+		if _, ok := urlMap[url]; ok {
+			return
+		} else {
+			urlMap[url] = true
+		}
+
+		title := e.ChildText("div > a.detail_link > span.ml-item-title")
+		tmp := &po.Maple8591Product{
+			Title:     title,
+			URL:       url,
+			Pageviews: e.ChildText("div.creatTime > span.ListHour"),
+		}
+
+		e.ForEach("div.other", func(i int, el *colly.HTMLElement) {
+			switch i {
+			case 0:
+				tmp.Amount = el.Text
+			case 1:
+				tmp.Number = el.Text
+			}
+		})
+		tmp.Server = mapleServer
+
+		products = append(products, tmp)
+	})
+
+	visitUrlMap := make(map[string]bool)
+	c.OnHTML("a[href].pageNum", func(e *colly.HTMLElement) {
+		url := e.Attr("href")
+		if _, ok := visitUrlMap[url]; ok {
+			return
+		} else {
+			visitUrlMap[url] = true
+		}
+
+		e.Request.Visit(url)
+	})
+	count := 0
+	c.OnHTML("span.R", func(e *colly.HTMLElement) {
+		c, _ := strconv.Atoi(e.Text)
+		count = c
+	})
+
+	// 启动
+	c.Visit(fmt.Sprintf(URL8591, glob.MapleServerMap[mapleServer], 0))
+
+	currencySlice := cs.setProductToCurrency(products)
+
+	defaultSize := 5
+	if len(currencySlice) < defaultSize {
+		defaultSize = len(currencySlice)
+	}
+	cResultSlice := currencySlice[0:defaultSize]
+	// 存入MYSQL
+	go cs.insertCurrency(cResultSlice)
+
+	result := []float64{}
+	for _, c := range cResultSlice {
+		result = append(result, c.Value)
+	}
+
+	return result, count
+}
+
+func (cs *currencyService) setProductToCurrency(products []*po.Maple8591Product) []*po.Currency {
+	currencySlice := []*po.Currency{}
+	for _, product := range products {
+		rp := regexp.MustCompile(rCurrencyValue)
+		items := rp.FindAllStringSubmatch(product.Title, -1)
+		var value float64
+		for _, item := range items {
+			a, _ := strconv.ParseFloat(item[1], 64)
+			b, _ := strconv.ParseFloat(item[2], 64)
+			value = b / a
+		}
+		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: product.Title, URL: product.URL})
+	}
+
+	sort.Slice(currencySlice, func(i, j int) bool {
+		return currencySlice[i].Value > currencySlice[j].Value
+	})
+
+	return currencySlice
 }
 
 // get8591CurrencyValueTop5 ...

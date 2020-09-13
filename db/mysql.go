@@ -2,13 +2,11 @@ package db
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/gfes980615/Diana/glob/common/log"
 
 	"github.com/gfes980615/Diana/glob/config"
-	_ "github.com/go-sql-driver/mysql" //加载mysql
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql" //加载mysql
+	"gorm.io/gorm"
 )
 
 // MySQL ...
@@ -42,7 +40,7 @@ func (db *MySQL) Connect(mysqlConf config.Mysql) error {
 		config.Database,
 	)
 
-	db.gorm, err = gorm.Open("mysql", connect)
+	db.gorm, err = gorm.Open(mysql.Open(connect), &gorm.Config{})
 	if err != nil {
 		return err
 	}
@@ -50,14 +48,14 @@ func (db *MySQL) Connect(mysqlConf config.Mysql) error {
 	log.Debug("Database [%s] Connect success", config.Name)
 
 	// TODO, load from config
-	db.gorm.LogMode(mysqlConf.LogMode)
-
-	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
-	db.gorm.DB().SetMaxIdleConns(mysqlConf.MaxIdle)
-	// SetMaxOpenConns sets the maximum number of open connections to the database.
-	db.gorm.DB().SetMaxOpenConns(mysqlConf.MaxOpen)
-	// SetConnMaxLifetime sets the maximum amount of timeUtil a connection may be reused.
-	db.gorm.DB().SetConnMaxLifetime(time.Duration(mysqlConf.ConnMaxLifeMin) * time.Minute)
+	//db.gorm.LogMode(mysqlConf.LogMode)
+	//
+	//// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
+	//db.gorm.DB().SetMaxIdleConns(mysqlConf.MaxIdle)
+	//// SetMaxOpenConns sets the maximum number of open connections to the database.
+	//db.gorm.DB().SetMaxOpenConns(mysqlConf.MaxOpen)
+	//// SetConnMaxLifetime sets the maximum amount of timeUtil a connection may be reused.
+	//db.gorm.DB().SetConnMaxLifetime(time.Duration(mysqlConf.ConnMaxLifeMin) * time.Minute)
 
 	return nil
 }
@@ -73,6 +71,6 @@ func (db *MySQL) Begin() *gorm.DB {
 }
 
 // Close ...
-func (db *MySQL) Close() {
-	db.gorm.Close()
-}
+//func (db *MySQL) Close() {
+//	db.gor
+//}

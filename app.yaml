@@ -23,6 +23,6 @@ DatabaseConfig:
       Name: diana
       Address: '127.0.0.1:3306'
       Username: root
-      Password: '1qaz!QAZ'
+      Password: '123456'
       Database: diana
       Enable: true

@@ -20,3 +20,7 @@ type SpiderService interface {
 	GetAllCount(string) int
 	GetEveryDaySentence() string
 }
+
+type Maple8591ProductService interface{
+	Get8591AllProduct()
+}

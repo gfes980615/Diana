@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/gfes980615/Diana/models/po"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type CurrencyRepository interface {
@@ -14,4 +14,9 @@ type CurrencyRepository interface {
 type LineUserRepository interface {
 	GetAllUser(DB *gorm.DB) ([]*po.LineUser, error)
 	Create(DB *gorm.DB, id string)
+}
+
+type Maple8591ProductRepository interface {
+	Insert(DB *gorm.DB, products []*po.Maple8591Product) error
+	CreateTable(DB *gorm.DB) error
 }

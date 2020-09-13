@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gfes980615/Diana/models/po"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -33,9 +33,9 @@ func (cr *currencyRepository) GetLastDayAvgValue(DB *gorm.DB) (float64, error) {
 	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 
 	value := &po.Currency{}
-	err := DB.Table("currency").Select("AVG(`amount`) AS `value`").Where("`abnormal` = ? AND `added_time` = ?", 0, yesterday).Take(value).Error
+	err := DB.Table("currency").Select("AVG(`value`) AS `value`").Where("`abnormal` = ? AND `added_time` = ?", 0, yesterday).Take(value).Error
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return value.Value, nil

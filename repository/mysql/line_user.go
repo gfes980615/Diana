@@ -4,8 +4,7 @@ import (
 	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/po"
-	"github.com/jinzhu/gorm"
-	"time"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -30,7 +29,7 @@ func (lr *lineUserRepository) GetAllUser(DB *gorm.DB) ([]*po.LineUser, error) {
 func (lr *lineUserRepository) Create(DB *gorm.DB, id string) {
 	user := &po.LineUser{
 		UserID:    id,
-		AddedTime: time.Now(),
+		//AddedTime: time.Now(),
 	}
 	err := DB.Table("line_user").Create(user).Error
 	log.Println(err)

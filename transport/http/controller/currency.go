@@ -13,7 +13,8 @@ func init() {
 }
 
 type CurrencyController struct {
-	currencyService service.CurrencyService `injection:"currencyService"`
+	currencyService         service.CurrencyService         `injection:"currencyService"`
+	maple8591ProductService service.Maple8591ProductService `injection:"maple8591ProductService"`
 }
 
 func (ctl *CurrencyController) SetupRouter(router *gin.Engine) {
@@ -21,6 +22,7 @@ func (ctl *CurrencyController) SetupRouter(router *gin.Engine) {
 	controller := router.Group("/diana")
 	controller.GET("/currency/chart", ctl.currencyChart)
 	controller.GET("/currency/value", ctl.currencyValue)
+	controller.GET("/test", ctl.get8591AllProduct)
 }
 
 //func (ctl *CurrencyController) currencyChart(ctx *gin.Context) {
@@ -64,4 +66,9 @@ func (ctl *CurrencyController) currencyChart(c *gin.Context) {
 		"subfunc": "每日平均幣值",
 	}
 	c.HTML(http.StatusOK, "maple_story.html", chartData)
+}
+
+func (ctl *CurrencyController) get8591AllProduct(c *gin.Context) {
+	ctl.maple8591ProductService.Get8591AllProduct()
+	common.Send(c, "ok")
 }
