@@ -21,6 +21,6 @@ type SpiderService interface {
 	GetEveryDaySentence() string
 }
 
-type Maple8591ProductService interface{
+type Maple8591ProductService interface {
 	Get8591AllProduct()
 }

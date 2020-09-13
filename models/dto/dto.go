@@ -12,3 +12,7 @@ type ReturnSlice struct {
 	YMax int
 	YMin int
 }
+
+type Message struct {
+	Message string `json:"message"`
+}

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gfes980615/Diana/injection"
+	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/service"
 	"github.com/gfes980615/Diana/transport/http/common"
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,7 @@ func (ctl *CurrencyController) SetupRouter(router *gin.Engine) {
 //func (ctl *CurrencyController) currencyChart(ctx *gin.Context) {
 //	ctx.JSON(common.Success, "ok")
 //}
+
 func (ctl *CurrencyController) currencyValue(ctx *gin.Context) {
 	type Tmp struct {
 		Server string `form:"server"`
@@ -43,7 +45,11 @@ func (ctl *CurrencyController) currencyValue(ctx *gin.Context) {
 		message = ctl.currencyService.GetMapleCurrencyMessage(t.Server)
 	}
 
-	common.Send(ctx, message)
+	testMessage := &dto.Message{
+		Message: message,
+	}
+
+	common.Send(ctx, testMessage)
 }
 
 func (ctl *CurrencyController) currencyChart(c *gin.Context) {
