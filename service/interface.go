@@ -13,6 +13,7 @@ type CurrencyService interface {
 	GetMapleCurrencyMessage(mapleServer string) string
 	GetMapleCurrencyChartData() (*dto.ReturnSlice, error)
 	GetAllServerCurrency() string
+	GetDailyMessage() (string, error)
 }
 
 type SpiderService interface {

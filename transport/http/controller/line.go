@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/transport/http/common"
 	"log"
 
@@ -17,13 +18,15 @@ func init() {
 }
 
 type LineController struct {
-	lineService   service.LineService   `injection:"lineService"`
-	spiderService service.SpiderService `injection:"spiderService"`
+	currencyService service.CurrencyService `injection:"currencyService"`
+	lineService     service.LineService     `injection:"lineService"`
+	spiderService   service.SpiderService   `injection:"spiderService"`
 }
 
 func (lc *LineController) SetupRouter(router *gin.Engine) {
 	router.GET("/callback", lc.callbackHandler)
 	router.GET("/daily/sentence", lc.Daily)
+	router.GET("/daily/currency/message", lc.dailyCurrencyMessage)
 }
 
 func (lc *LineController) callbackHandler(ctx *gin.Context) {
@@ -37,4 +40,18 @@ func (lc *LineController) callbackHandler(ctx *gin.Context) {
 
 func (lc *LineController) Daily(ctx *gin.Context) {
 	common.Send(ctx, lc.spiderService.GetEveryDaySentence())
+}
+
+func (lc *LineController) dailyCurrencyMessage(ctx *gin.Context) {
+	message, err := lc.currencyService.GetDailyMessage()
+	if err != nil {
+		common.Send(ctx, err)
+		return
+	}
+
+	testMessage := &dto.Message{
+		Message: message,
+	}
+	common.Send(ctx, testMessage)
+
 }

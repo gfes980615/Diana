@@ -9,6 +9,7 @@ type CurrencyRepository interface {
 	Insert(DB *gorm.DB, currencySlice []*po.Currency) error
 	GetLastDayAvgValue(DB *gorm.DB) (float64, error)
 	GetCurrencyChartData(DB *gorm.DB) ([]*po.Currency, error)
+	GetDailyItems(DB *gorm.DB) (map[string][]*po.Currency, error)
 }
 
 type LineUserRepository interface {

@@ -252,8 +252,8 @@ func (cs currencyService) insertAndWarning(currencySlice []*po.Currency, users [
 }
 
 func (cs currencyService) pushAbnormalCurrency(product *po.Currency, users []*po.LineUser) {
-	messageFormat := "%s:幣值異常\n%s"
-	replyMessage := fmt.Sprintf(messageFormat, product.Server, product.URL)
+	messageFormat := "%s : 標題幣值異常\n1:%.f\n%s"
+	replyMessage := fmt.Sprintf(messageFormat, glob.MapleServerZH[product.Server], product.Value, product.URL)
 
 	for _, u := range users {
 		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(replyMessage)).Do()
@@ -327,4 +327,30 @@ func (cs currencyService) GetAllServerCurrency() string {
 	}
 
 	return resultMessage
+}
+
+func (cs currencyService) GetDailyMessage() (string, error) {
+	DB := db.MysqlConn.Session()
+	dailyItems, err := cs.currencyRepository.GetDailyItems(DB)
+	if err != nil {
+		return "", err
+	}
+	returnMessage := ""
+	for key, items := range dailyItems {
+		dailyMessageFormat := "%s : %.f\n"
+		switch key {
+		case "max":
+			returnMessage += "\n每日最大幣值\n"
+			for _, item := range items {
+				returnMessage += fmt.Sprintf(dailyMessageFormat, glob.MapleServerZH[item.Server], item.Value)
+			}
+		case "avg":
+			returnMessage += "\n每日平均幣值\n"
+			for _, item := range items {
+				returnMessage += fmt.Sprintf(dailyMessageFormat, glob.MapleServerZH[item.Server], item.Value)
+			}
+		}
+	}
+
+	return returnMessage, nil
 }

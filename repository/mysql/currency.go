@@ -53,6 +53,28 @@ func (cr *currencyRepository) GetCurrencyChartData(DB *gorm.DB) ([]*po.Currency,
 	return currency, nil
 }
 
+func (cr *currencyRepository) GetDailyItems(DB *gorm.DB) (map[string][]*po.Currency, error) {
+	dailyMaxSQL := fmt.Sprintf("select server,max(value) as value from currency where added_time = (select added_time from currency order by added_time desc limit 1) group by server")
+	maxItems := []*po.Currency{}
+	if err := DB.Raw(dailyMaxSQL).Scan(&maxItems).Error; err != nil {
+		return nil, err
+	}
+
+	dailyAvgSQL := fmt.Sprintf("select server,avg(value) as value from currency where added_time = (select added_time from currency order by added_time desc limit 1) group by server")
+	avgItems := []*po.Currency{}
+	if err := DB.Raw(dailyAvgSQL).Scan(&avgItems).Error; err != nil {
+		return nil, err
+	}
+
+	result := map[string][]*po.Currency{
+		"max": maxItems,
+		"avg": avgItems,
+	}
+
+	return result, nil
+
+}
+
 // Insert maybe can use Create()?
 // Insert 存入MYSQL
 //func (cr currencyRepository) InsertAndWarning(DB *gorm.DB, currencySlice []po.Currency, users []po.LineUser) error {
