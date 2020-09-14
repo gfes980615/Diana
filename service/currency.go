@@ -135,7 +135,7 @@ func (cs *currencyService) setProductToCurrency(products []*po.Maple8591Product)
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: removeExtraChar(product.Title), URL: replaceQuestionMark(product.URL)})
+		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: removeExtraChar(product.Title), URL: root8591 + product.URL})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {
