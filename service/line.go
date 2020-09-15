@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/gfes980615/Diana/db"
+	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/repository/mysql"
 	"regexp"
 	"strings"
@@ -100,4 +101,17 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 func IsURL(url string) bool {
 	isurl, _ := regexp.MatchString("http([s]*)://(.*?)", url)
 	return isurl
+}
+
+func (ls *lineService) PushMessage(message string) {
+	DB := db.MysqlConn.Session()
+	lineUsers, err := ls.lineUserRepository.GetAllUser(DB)
+	if err != nil {
+		log.Errorf("get line user error %v", err)
+		return
+	}
+
+	for _, u := range lineUsers {
+		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(message)).Do()
+	}
 }

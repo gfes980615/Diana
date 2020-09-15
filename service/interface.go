@@ -7,6 +7,7 @@ import (
 
 type LineService interface {
 	ReplyMessage(events []*linebot.Event) error
+	PushMessage(message string)
 }
 
 type CurrencyService interface {

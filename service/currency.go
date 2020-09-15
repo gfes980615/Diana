@@ -35,6 +35,7 @@ type currencyService struct {
 	currencyRepository mysql.CurrencyRepository `injection:"currencyRepository"`
 	lineUserRepository mysql.LineUserRepository `injection:"lineUserRepository"`
 	spiderService      SpiderService            `injection:"spiderService"`
+	lineService        LineService              `injection:"lineService"`
 }
 
 func (cs *currencyService) GetMapleCurrencyMessage(mapleServer string) string {
@@ -335,22 +336,22 @@ func (cs currencyService) GetDailyMessage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	returnMessage := ""
+	returnMessage := "每日提醒:\n"
 	for key, items := range dailyItems {
 		dailyMessageFormat := "%s : %.f\n"
 		switch key {
 		case "max":
-			returnMessage += "\n每日最大幣值\n"
+			returnMessage += "\n最大幣值:\n"
 			for _, item := range items {
 				returnMessage += fmt.Sprintf(dailyMessageFormat, glob.MapleServerZH[item.Server], item.Value)
 			}
 		case "avg":
-			returnMessage += "\n每日平均幣值\n"
+			returnMessage += "\n平均幣值:\n"
 			for _, item := range items {
 				returnMessage += fmt.Sprintf(dailyMessageFormat, glob.MapleServerZH[item.Server], item.Value)
 			}
 		}
 	}
-
+	cs.lineService.PushMessage(returnMessage)
 	return returnMessage, nil
 }
