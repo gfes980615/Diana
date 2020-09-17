@@ -38,7 +38,7 @@ func (mp Maple8591Product) TableName() string {
 	return "maple_product"
 }
 
-type Activity struct {
+type KktixActivity struct {
 	Title             string
 	URL               string
 	Introduction      string
@@ -47,4 +47,11 @@ type Activity struct {
 	TicketStatus      string
 	ParticipateNumber string
 	ActivityTime      string
+}
+
+type TTActivity struct {
+	Title        string
+	URL          string
+	ActivityTime string
+	Viewers      string // 觀看人數
 }

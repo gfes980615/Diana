@@ -27,4 +27,5 @@ type Maple8591ProductService interface {
 
 type ActivityService interface {
 	GetKktixActivity()
+	GetTravelTaipeiActivity()
 }
