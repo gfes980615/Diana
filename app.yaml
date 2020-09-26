@@ -2,7 +2,7 @@
 LogConfig:
   Name: diana
   Env: dev
-  Level: debug
+  Level: info
   Duration: 24h
   HistoryPath: tmp
   FullColor: True

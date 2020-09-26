@@ -20,3 +20,7 @@ type Maple8591ProductRepository interface {
 	Insert(DB *gorm.DB, products []*po.Maple8591Product) error
 	CreateTable(DB *gorm.DB) error
 }
+
+type TravelRepository interface {
+	CreateTravelTaipeiTravelItem(DB *gorm.DB, items []*po.TravelList) error
+}

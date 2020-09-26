@@ -2,11 +2,14 @@ package service
 
 import (
 	"fmt"
+	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/po"
+	"github.com/gfes980615/Diana/repository/mysql"
 	"github.com/gocolly/colly"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -23,8 +26,9 @@ const (
 	kktix_root       = "https://kktix.com"
 	kktix_exhibition = "https://kktix.com/events?category_id=11" // 展覽
 
-	travelTaipei_root = "https://www.travel.taipei"
-	travelTaipei_show = "https://www.travel.taipei/zh-tw/activity?sortby=Recently&page=1" // travel taipei 活動展演
+	travelTaipei_root   = "https://www.travel.taipei"
+	travelTaipei_show   = "https://www.travel.taipei/zh-tw/activity?sortby=Recently&page=1" // travel taipei 活動展演
+	travelTaipei_themes = "https://www.travel.taipei/zh-tw/attraction/themes"
 )
 
 var (
@@ -37,10 +41,17 @@ var (
 )
 
 type activityService struct {
+	travelRepository mysql.TravelRepository `injection:"travelRepository"`
 }
 
-func (as *activityService) GetTravelTaipeiActivity() {
-	as.getTravelTaipeiItems()
+func (as *activityService) GetTravelTaipeiActivity(category string) {
+	switch category {
+	case "exhibition":
+		as.getTravelTaipeiExhibitionItems()
+	case "travel_list":
+		as.getTravelTaipeiAllTravelList()
+	}
+
 }
 
 func (as *activityService) GetKktixActivity() {
@@ -66,10 +77,64 @@ func (as *activityService) GetKktixActivity() {
 	fmt.Println("end ...")
 }
 
-func (as *activityService) getTravelTaipeiItems() {
+func (as *activityService) getTravelTaipeiAllTravelList() {
+	themesURL := as.getTravelTaipeiThemesList()
+
+	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
+
+	travelList := []*po.TravelList{}
+	tmpCategory := ""
+	c.OnHTML("ul.event-news-card-list > li.item", func(e *colly.HTMLElement) {
+		tmp := &po.TravelList{
+			Title:    e.ChildText("div.info-card-item > a.link > div.info-blk > h3.info-title"),
+			Category: themesURL[tmpCategory],
+			URL:      travelTaipei_root + e.ChildAttr("div.info-card-item > a.link", "href"),
+		}
+		travelList = append(travelList, tmp)
+	})
+
+	c.OnHTML("div.page-bar > div.blk", func(e *colly.HTMLElement) {
+		c.Visit(travelTaipei_root + e.ChildAttr("a.next-page", "href"))
+	})
+
+	DB := db.MysqlConn.Session()
+	for url, _ := range themesURL {
+		tmpCategory = url
+		c.Visit(url)
+		if err := as.travelRepository.CreateTravelTaipeiTravelItem(DB, travelList); err != nil {
+			log.Error(err)
+		}
+		travelList = []*po.TravelList{}
+	}
+}
+
+func (as *activityService) getTravelTaipeiThemesList() map[string]string {
+	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
+
+	themesURLs := make(map[string]string)
+	c.OnHTML("ul.d-flex > li.col-6", func(e *colly.HTMLElement) {
+		title := e.ChildText("div.d-block a.text-decoration-none > h3.fz-16px")
+		url := travelTaipei_root + e.ChildAttr("div.d-block a.text-decoration-none", "href")
+		themesURLs[url] = title
+	})
+
+	c.Visit(travelTaipei_themes)
+
+	return themesURLs
+}
+
+func (as *activityService) getTravelTaipeiExhibitionItems() {
 	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
 	resultItems := []*po.TTActivity{}
+
+	visitTag := true
+
 	c.OnHTML("ul.event-news-card-list > li.item", func(e *colly.HTMLElement) {
+		activityTime := e.ChildText("div.info-card-item > a.link > div.info-blk > span.duration")
+		if as.activityIsEnd(activityTime) {
+			visitTag = false
+			return
+		}
 		ttItem := &po.TTActivity{
 			Title:        e.ChildText("div.info-card-item > a.link > div.info-blk > h3.info-title"),
 			URL:          travelTaipei_root + e.ChildAttr("div.info-card-item > a.link", "href"),
@@ -79,6 +144,12 @@ func (as *activityService) getTravelTaipeiItems() {
 		resultItems = append(resultItems, ttItem)
 	})
 
+	c.OnHTML("div.page-bar > div.blk", func(e *colly.HTMLElement) {
+		if visitTag {
+			c.Visit(travelTaipei_root + e.ChildAttr("a.next-page", "href"))
+		}
+	})
+
 	c.Visit(travelTaipei_show)
 
 	for i, item := range resultItems {
@@ -86,6 +157,22 @@ func (as *activityService) getTravelTaipeiItems() {
 	}
 }
 
+// 檢查活動是否結束
+func (as *activityService) activityIsEnd(activityTime string) bool {
+	activityTimes := strings.Split(activityTime, "～")
+	var lastDate time.Time
+	if len(activityTimes) > 1 {
+		lastDate, _ = time.Parse("2006-01-02", activityTimes[1])
+	} else {
+		lastDate, _ = time.Parse("2006-01-02", activityTimes[0])
+	}
+
+	if lastDate.Before(time.Now()) {
+		return true
+	}
+
+	return false
+}
 func (as *activityService) getKKtixActivityItems(url string) (map[string]*po.KktixActivity, []string) {
 	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
 	d := colly.NewCollector(colly.UserAgent(as.randomAgent()))

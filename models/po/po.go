@@ -55,3 +55,15 @@ type TTActivity struct {
 	ActivityTime string
 	Viewers      string // 觀看人數
 }
+
+type TravelList struct {
+	ID       int    `gorm:"primary_key;column:id;type:int(11);not null"`
+	Title    string `gorm:"column:title;type:varchar(45)"`
+	Category string `gorm:"column:category;type:varchar(45)"`
+	URL      string `gorm:"unique;column:url;type:varchar(45)"`
+	Status   int    `gorm:"column:status;type:int(11)"` // 0:沒去過,1:去過了,2:沒興趣
+}
+
+func (t TravelList) TableName() string {
+	return "travel_list"
+}
