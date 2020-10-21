@@ -25,6 +25,7 @@ const (
 
 	kktix_root       = "https://kktix.com"
 	kktix_exhibition = "https://kktix.com/events?category_id=11" // 展覽
+	kktix_all        = "https://kktix.com/events"
 
 	travelTaipei_root   = "https://www.travel.taipei"
 	travelTaipei_show   = "https://www.travel.taipei/zh-tw/activity?sortby=Recently&page=1" // travel taipei 活動展演
@@ -41,43 +42,53 @@ var (
 )
 
 type activityService struct {
-	travelRepository mysql.TravelRepository `injection:"travelRepository"`
+	travelRepository mysql.TravelRepository `injection:""`
 }
 
-func (as *activityService) GetTravelTaipeiActivity(category string) {
+func (as *activityService) GetTravelTaipeiActivity(category string) []*po.TTActivity {
 	switch category {
 	case "exhibition":
-		as.getTravelTaipeiExhibitionItems()
+		return as.getTravelTaipeiExhibitionItems()
 	case "travel_list":
 		as.getTravelTaipeiAllTravelList()
 	}
-
+	return []*po.TTActivity{}
 }
 
-func (as *activityService) GetKktixActivity() {
+func (as *activityService) GetKktixActivity(category string) []*po.KktixActivity {
+	var url string
+	switch category {
+	case "exhibition":
+		url = kktix_exhibition
+	case "all":
+		url = kktix_all
+	}
 
-	activityMap, forSortSlice := as.getKKtixActivityItems(kktix_exhibition)
-
+	activityMap, forSortSlice := as.getKKtixActivityItems(url)
+	result := []*po.KktixActivity{}
 	number := 1
 	for _, activity := range forSortSlice {
 		if len(activity) == 0 {
 			continue
 		}
-		fmt.Println(number)
-		fmt.Println("活動名稱:", activityMap[activity].Title)
-		fmt.Println("報名網址:", activityMap[activity].URL)
-		fmt.Println("活動簡介:", activityMap[activity].Introduction)
-		fmt.Println("活動分類:", activityMap[activity].Category)
-		fmt.Println("參加人數:", activityMap[activity].ParticipateNumber)
-		fmt.Println("刊登日期:", activityMap[activity].CreateTime)
-		fmt.Println("票卷狀態:", activityMap[activity].TicketStatus)
-		fmt.Println("活動時間:", activityMap[activity].ActivityTime)
+		//fmt.Println(number)
+		//fmt.Println("活動名稱:", activityMap[activity].Title)
+		//fmt.Println("報名網址:", activityMap[activity].URL)
+		//fmt.Println("活動簡介:", activityMap[activity].Introduction)
+		//fmt.Println("活動分類:", activityMap[activity].Category)
+		//fmt.Println("參加人數:", activityMap[activity].ParticipateNumber)
+		//fmt.Println("刊登日期:", activityMap[activity].CreateTime)
+		//fmt.Println("票卷狀態:", activityMap[activity].TicketStatus)
+		//fmt.Println("活動時間:", activityMap[activity].ActivityTime)
 		number++
+
+		result = append(result, activityMap[activity])
 	}
-	fmt.Println("end ...")
+	//fmt.Println("end ...")
+	return result
 }
 
-func (as *activityService) getTravelTaipeiAllTravelList() {
+func (as *activityService) getTravelTaipeiAllTravelList() []*po.TravelList {
 	themesURL := as.getTravelTaipeiThemesList()
 
 	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
@@ -93,9 +104,9 @@ func (as *activityService) getTravelTaipeiAllTravelList() {
 		travelList = append(travelList, tmp)
 	})
 
-	c.OnHTML("div.page-bar > div.blk", func(e *colly.HTMLElement) {
-		c.Visit(travelTaipei_root + e.ChildAttr("a.next-page", "href"))
-	})
+	//c.OnHTML("div.page-bar > div.blk", func(e *colly.HTMLElement) {
+	//	c.Visit(travelTaipei_root + e.ChildAttr("a.next-page", "href"))
+	//})
 
 	DB := db.MysqlConn.Session()
 	for url, _ := range themesURL {
@@ -106,6 +117,8 @@ func (as *activityService) getTravelTaipeiAllTravelList() {
 		}
 		travelList = []*po.TravelList{}
 	}
+
+	return travelList
 }
 
 func (as *activityService) getTravelTaipeiThemesList() map[string]string {
@@ -123,7 +136,7 @@ func (as *activityService) getTravelTaipeiThemesList() map[string]string {
 	return themesURLs
 }
 
-func (as *activityService) getTravelTaipeiExhibitionItems() {
+func (as *activityService) getTravelTaipeiExhibitionItems() []*po.TTActivity {
 	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
 	resultItems := []*po.TTActivity{}
 
@@ -155,6 +168,7 @@ func (as *activityService) getTravelTaipeiExhibitionItems() {
 	for i, item := range resultItems {
 		fmt.Printf("%d\n標題:%s\n網址:%s\n活動時間:%s\n查看人數:%s\n", i+1, item.Title, item.URL, item.ActivityTime, item.Viewers)
 	}
+	return resultItems
 }
 
 // 檢查活動是否結束
@@ -237,8 +251,8 @@ func (as *activityService) getKKtixActivityItems(url string) (map[string]*po.Kkt
 		}
 	})
 
-	for url, _ := range as.getKktixPageByURL(url) {
-		c.Visit(url)
+	for subUrl, _ := range as.getKktixPageByURL(url) {
+		c.Visit(subUrl)
 	}
 
 	return activityMap, forSortSlice
@@ -259,8 +273,8 @@ func (as *activityService) getKktixPageByURL(url string) map[string]bool {
 			if url == "#" {
 				return
 			}
-			if _, ok := visitURL[url]; !ok {
-				visitURL[url] = true
+			if _, ok := visitURL[kktix_root+url]; !ok {
+				visitURL[kktix_root+url] = true
 				log.Info(kktix_root + url)
 			}
 			urlSlice = append(urlSlice, url)

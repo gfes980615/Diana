@@ -2,11 +2,13 @@ package service
 
 import (
 	"github.com/gfes980615/Diana/models/dto"
+	"github.com/gfes980615/Diana/models/po"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 type LineService interface {
 	ReplyMessage(events []*linebot.Event) error
+	GetActivityMessage() string
 }
 
 type CurrencyService interface {
@@ -26,6 +28,6 @@ type Maple8591ProductService interface {
 }
 
 type ActivityService interface {
-	GetKktixActivity()
-	GetTravelTaipeiActivity(category string)
+	GetKktixActivity(category string) []*po.KktixActivity
+	GetTravelTaipeiActivity(category string) []*po.TTActivity
 }

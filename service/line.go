@@ -2,7 +2,9 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gfes980615/Diana/db"
+	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/repository/mysql"
 	"regexp"
 	"strings"
@@ -20,6 +22,7 @@ type lineService struct {
 	currencyService    CurrencyService          `injection:"currencyService"`
 	spiderService      SpiderService            `injection:"spiderService"`
 	lineUserRepository mysql.LineUserRepository `injection:"lineUserRepository"`
+	activityService    ActivityService          `injection:"activityService"`
 }
 
 func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
@@ -65,6 +68,11 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 		return nil
 	}
 
+	if keyword == "活動" {
+		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ls.GetActivityMessage())).Do()
+		return nil
+	}
+
 	//web := strings.Split(keyword, " ")
 	//if (len(web) == 2 && IsURL(web[1])) || (len(web) == 1 && IsURL((web[0]))) {
 	//	message := "save successful"
@@ -95,6 +103,33 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 	//	log.Print(err)
 	//}
 	return nil
+}
+
+func (ls *lineService) GetActivityMessage() string {
+	activitys := []*dto.Activity{}
+	ttActivity := ls.activityService.GetTravelTaipeiActivity("exhibition")
+	for _, a := range ttActivity {
+		tmp := &dto.Activity{
+			Title: a.Title,
+			URL:   a.URL,
+			Time:  a.ActivityTime,
+		}
+		activitys = append(activitys, tmp)
+	}
+	kkActivity := ls.activityService.GetKktixActivity("exhibition")
+	for _, a := range kkActivity {
+		tmp := &dto.Activity{
+			Title: a.Title,
+			URL:   a.URL,
+			Time:  a.ActivityTime,
+		}
+		activitys = append(activitys, tmp)
+	}
+	message := ""
+	for _, a := range activitys {
+		message += fmt.Sprintf("活動:%s\n時間:%s\n網站:%s\n\n", a.Title, a.Time, a.URL)
+	}
+	return message
 }
 
 func IsURL(url string) bool {

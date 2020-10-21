@@ -16,12 +16,13 @@ type ActivityController struct {
 
 func (ctl *ActivityController) SetupRouter(router *gin.Engine) {
 	controller := router.Group("/diana/activity")
-	controller.GET("/kktix", ctl.getKktixActivity)
+	controller.GET("/kktix/:category", ctl.getKktixActivity)
 	controller.GET("/travel_taipei/:category", ctl.getTravelTaipeiActivity)
 }
 
 func (ctl *ActivityController) getKktixActivity(ctx *gin.Context) {
-	ctl.activityService.GetKktixActivity()
+	category:=ctx.Param("category")
+	ctl.activityService.GetKktixActivity(category)
 }
 
 func (ctl *ActivityController) getTravelTaipeiActivity(ctx *gin.Context) {

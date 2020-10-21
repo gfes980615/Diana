@@ -24,6 +24,7 @@ type LineController struct {
 func (lc *LineController) SetupRouter(router *gin.Engine) {
 	router.GET("/callback", lc.callbackHandler)
 	router.GET("/daily/sentence", lc.Daily)
+	router.GET("/debug", lc.Debug)
 }
 
 func (lc *LineController) callbackHandler(ctx *gin.Context) {
@@ -37,4 +38,8 @@ func (lc *LineController) callbackHandler(ctx *gin.Context) {
 
 func (lc *LineController) Daily(ctx *gin.Context) {
 	common.Send(ctx, lc.spiderService.GetEveryDaySentence())
+}
+
+func (lc *LineController) Debug(ctx *gin.Context) {
+	common.Send(ctx, lc.lineService.GetActivityMessage())
 }
