@@ -16,3 +16,9 @@ type ReturnSlice struct {
 type Message struct {
 	Message string `json:"message"`
 }
+
+type Activity struct {
+	Title string
+	URL   string
+	Time  string
+}

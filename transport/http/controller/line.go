@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"log"
+
 	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/transport/http/common"
-	"log"
 
 	"github.com/gfes980615/Diana/service"
 
@@ -27,6 +28,7 @@ func (lc *LineController) SetupRouter(router *gin.Engine) {
 	router.GET("/callback", lc.callbackHandler)
 	router.GET("/daily/sentence", lc.Daily)
 	router.GET("/daily/currency/message", lc.dailyCurrencyMessage)
+	router.GET("/debug", lc.Debug)
 }
 
 func (lc *LineController) callbackHandler(ctx *gin.Context) {
@@ -53,5 +55,8 @@ func (lc *LineController) dailyCurrencyMessage(ctx *gin.Context) {
 		Message: message,
 	}
 	common.Send(ctx, testMessage)
+}
 
+func (lc *LineController) Debug(ctx *gin.Context) {
+	common.Send(ctx, lc.lineService.GetActivityMessage())
 }
