@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/gfes980615/Diana/utils"
 	"regexp"
 	"strings"
 
@@ -111,21 +112,13 @@ func (ls *lineService) GetActivityMessage() string {
 	activitys := []*dto.Activity{}
 	ttActivity := ls.activityService.GetTravelTaipeiActivity("exhibition")
 	for _, a := range ttActivity {
-		tmp := &dto.Activity{
-			Title: a.Title,
-			URL:   a.URL,
-			Time:  a.ActivityTime,
-		}
-		activitys = append(activitys, tmp)
+		tmp := utils.StructCopy(a, dto.Activity{})
+		activitys = append(activitys, tmp.(*dto.Activity))
 	}
 	kkActivity := ls.activityService.GetKktixActivity("exhibition")
 	for _, a := range kkActivity {
-		tmp := &dto.Activity{
-			Title: a.Title,
-			URL:   a.URL,
-			Time:  a.ActivityTime,
-		}
-		activitys = append(activitys, tmp)
+		tmp := utils.StructCopy(a, dto.Activity{})
+		activitys = append(activitys, tmp.(*dto.Activity))
 	}
 	message := ""
 	for _, a := range activitys {

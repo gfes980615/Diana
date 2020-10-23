@@ -7,6 +7,7 @@ import (
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/gfes980615/Diana/repository/mysql"
+	"github.com/gfes980615/Diana/utils"
 	"github.com/gocolly/colly"
 	"math/rand"
 	"strings"
@@ -42,7 +43,8 @@ var (
 )
 
 type activityService struct {
-	travelRepository mysql.TravelRepository `injection:""`
+	travelRepository   mysql.TravelRepository   `injection:"travelRepository"`
+	activityRepository mysql.ActivityRepository `injection:"activityRepository"`
 }
 
 func (as *activityService) GetTravelTaipeiActivity(category string) []*po.TTActivity {
@@ -85,6 +87,15 @@ func (as *activityService) GetKktixActivity(category string) []*po.KktixActivity
 		result = append(result, activityMap[activity])
 	}
 	//fmt.Println("end ...")
+	err := utils.CreateTable(db.MysqlConn.Session(), "kktix_activity", &po.KktixActivity{})
+	if err != nil {
+		log.Error(err)
+	}
+	err = as.activityRepository.CreateKKtixActivityItem(db.MysqlConn.Session(), result)
+	if err != nil {
+		log.Error(err)
+	}
+
 	return result
 }
 

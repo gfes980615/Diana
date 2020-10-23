@@ -25,3 +25,7 @@ type Maple8591ProductRepository interface {
 type TravelRepository interface {
 	CreateTravelTaipeiTravelItem(DB *gorm.DB, items []*po.TravelList) error
 }
+
+type ActivityRepository interface {
+	CreateKKtixActivityItem(DB *gorm.DB, items []*po.KktixActivity) error
+}

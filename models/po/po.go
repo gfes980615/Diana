@@ -39,14 +39,19 @@ func (mp Maple8591Product) TableName() string {
 }
 
 type KktixActivity struct {
-	Title             string
-	URL               string
-	Introduction      string
-	Category          string
-	CreateTime        string
-	TicketStatus      string
-	ParticipateNumber string
-	ActivityTime      string
+	ID                int    `gorm:"column:id;primary_key;not null;autoIncrement"`
+	Title             string `gorm:"column:title;type:text"`
+	URL               string `gorm:"column:url;type:text"`
+	Introduction      string `gorm:"column:introduction;type:text"`
+	Category          string `gorm:"column:category;type:text"`
+	CreateTime        string `gorm:"column:create_time;type:text"`
+	TicketStatus      string `gorm:"column:ticket_status;type:text"`
+	ParticipateNumber string `gorm:"column:participate_number;type:text"`
+	ActivityTime      string `gorm:"column:activity_time;type:text"`
+}
+
+func (k KktixActivity) TableName() string {
+	return "kktix_activity"
 }
 
 type TTActivity struct {

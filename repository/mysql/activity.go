@@ -14,7 +14,7 @@ func init() {
 type activityRepository struct {
 }
 
-func (tr *activityRepository) CreateTravelTaipeiTravelItem(DB *gorm.DB, items []*po.KktixActivity) error {
+func (tr *activityRepository) CreateKKtixActivityItem(DB *gorm.DB, items []*po.KktixActivity) error {
 	for _, item := range items {
 		err := DB.Create(item).Error
 		if err == nil {

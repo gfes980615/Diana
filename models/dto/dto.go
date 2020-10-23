@@ -22,3 +22,11 @@ type Activity struct {
 	URL   string
 	Time  string
 }
+
+func (a Activity) GetStruct() interface{} {
+	return Activity{}
+}
+
+func (a Activity) GetStructPtr() interface{} {
+	return &Activity{}
+}
