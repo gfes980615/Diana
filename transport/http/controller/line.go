@@ -52,18 +52,21 @@ func (lc *LineController) callbackLineTemplateHandler(ctx *gin.Context) {
 	err := ctx.Bind(conds)
 	if err != nil {
 		common.Error(ctx, err)
+		log.Print(err)
 		return
 	}
 	events := []*linebot.Event{}
 	err = json.Unmarshal(conds.Events, &events)
 	if err != nil {
 		common.Error(ctx, err)
+		log.Print(err)
 		return
 	}
 
 	err = lc.lineService.ReplyMessage(events)
 	if err != nil {
 		common.Error(ctx, err)
+		log.Print(err)
 		return
 	}
 	common.Send(ctx, "ok")
