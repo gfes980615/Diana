@@ -44,19 +44,19 @@ func (lc *LineController) callbackHandler(ctx *gin.Context) {
 }
 
 type LineMessage struct {
-	Events []byte `json:"events" form:"events"`
+	Events string `json:"events" form:"events"`
 }
 
 func (lc *LineController) callbackLineTemplateHandler(ctx *gin.Context) {
 	conds := &LineMessage{}
-	err := ctx.Bind(conds)
+	err := ctx.ShouldBind(conds)
 	if err != nil {
 		common.Error(ctx, err)
 		log.Print(err)
 		return
 	}
 	events := []*linebot.Event{}
-	err = json.Unmarshal(conds.Events, &events)
+	err = json.Unmarshal([]byte(conds.Events), &events)
 	if err != nil {
 		common.Error(ctx, err)
 		log.Print(err)
