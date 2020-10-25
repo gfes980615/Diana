@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
-	"github.com/line/line-bot-sdk-go/linebot"
 	"log"
 
 	"github.com/gfes980615/Diana/models/dto"
@@ -43,33 +41,19 @@ func (lc *LineController) callbackHandler(ctx *gin.Context) {
 	lc.lineService.ReplyMessage(events)
 }
 
-type LineMessage struct {
-	Events string `json:"events" form:"events"`
-}
-
 func (lc *LineController) callbackLineTemplateHandler(ctx *gin.Context) {
-	conds := &LineMessage{}
-	err := ctx.ShouldBind(conds)
+	conds := &dto.LineMessage{}
+	err := conds.Init(ctx)
 	if err != nil {
-		common.Error(ctx, err)
-		log.Print(err)
-		return
-	}
-	events := []*linebot.Event{}
-	err = json.Unmarshal([]byte(conds.Events), &events)
-	if err != nil {
-		common.Error(ctx, err)
 		log.Print(err)
 		return
 	}
 
-	err = lc.lineService.ReplyMessage(events)
+	err = lc.lineService.ReplyMessage(conds.LineEvents)
 	if err != nil {
-		common.Error(ctx, err)
 		log.Print(err)
 		return
 	}
-	common.Send(ctx, "ok")
 }
 
 func (lc *LineController) Daily(ctx *gin.Context) {

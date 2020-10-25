@@ -1,5 +1,11 @@
 package dto
 
+import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"github.com/line/line-bot-sdk-go/linebot"
+)
+
 // ReturnSlice ...
 type ReturnSlice struct {
 	Date []string
@@ -29,4 +35,22 @@ func (a Activity) GetStruct() interface{} {
 
 func (a Activity) GetStructPtr() interface{} {
 	return &Activity{}
+}
+
+type LineMessage struct {
+	Events     string `json:"events" form:"events"`
+	LineEvents []*linebot.Event
+}
+
+func (lm *LineMessage) Init(ctx *gin.Context) error {
+	err := ctx.ShouldBind(lm)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal([]byte(lm.Events), &lm.LineEvents)
+	if err != nil {
+		return err
+	}
+	return nil
 }
