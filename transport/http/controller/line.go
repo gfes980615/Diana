@@ -54,6 +54,8 @@ func (lc *LineController) callbackLineTemplateHandler(ctx *gin.Context) {
 		log.Print(err)
 		return
 	}
+	log.Println(conds.LineEvents)
+	log.Println(conds.Events)
 }
 
 func (lc *LineController) Daily(ctx *gin.Context) {
