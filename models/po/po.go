@@ -72,3 +72,16 @@ type TravelList struct {
 func (t TravelList) TableName() string {
 	return "travel_list"
 }
+
+type TouristAttractionList struct {
+	Place        string `gorm:"place"`
+	URL          string `gorm:"url"`
+	ActivityTime string `gorm:"activity_time"`
+	Country      string `gorm:"country"`
+	Location     string `gorm:"location"`
+	Address      string `gorm:"address"`
+}
+
+func (t TouristAttractionList) TableName() string {
+	return "tourist_attraction_list"
+}

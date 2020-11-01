@@ -33,3 +33,8 @@ type ActivityService interface {
 	GetKktixActivity(category string) []*po.KktixActivity
 	GetTravelTaipeiActivity(category string) []*po.TTActivity
 }
+
+type TravelService interface {
+	TaoyuanTravelPlace() error
+	GetTravelPlaceByArea(country, location string) ([]*po.TouristAttractionList, error)
+}

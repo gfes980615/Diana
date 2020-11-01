@@ -9,7 +9,6 @@ import (
 	"github.com/gfes980615/Diana/repository/mysql"
 	"github.com/gfes980615/Diana/utils"
 	"github.com/gocolly/colly"
-	"math/rand"
 	"strings"
 	"time"
 )
@@ -19,11 +18,6 @@ func init() {
 }
 
 const (
-	userAgent1 = "AppleWebKit/537.36 (KHTML, like Gecko)"
-	userAgent2 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-	userAgent3 = "Chrome/85.0.4183.102 Safari/537.36"
-	userAgent4 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
-
 	kktix_root       = "https://kktix.com"
 	kktix_exhibition = "https://kktix.com/events?category_id=11" // 展覽
 	kktix_all        = "https://kktix.com/events"
@@ -31,15 +25,6 @@ const (
 	travelTaipei_root   = "https://www.travel.taipei"
 	travelTaipei_show   = "https://www.travel.taipei/zh-tw/activity?sortby=Recently&page=1" // travel taipei 活動展演
 	travelTaipei_themes = "https://www.travel.taipei/zh-tw/attraction/themes"
-)
-
-var (
-	userAgent = map[int]string{
-		1: userAgent1,
-		2: userAgent2,
-		3: userAgent3,
-		4: userAgent4,
-	}
 )
 
 type activityService struct {
@@ -73,15 +58,6 @@ func (as *activityService) GetKktixActivity(category string) []*po.KktixActivity
 		if len(activity) == 0 {
 			continue
 		}
-		//fmt.Println(number)
-		//fmt.Println("活動名稱:", activityMap[activity].Title)
-		//fmt.Println("報名網址:", activityMap[activity].URL)
-		//fmt.Println("活動簡介:", activityMap[activity].Introduction)
-		//fmt.Println("活動分類:", activityMap[activity].Category)
-		//fmt.Println("參加人數:", activityMap[activity].ParticipateNumber)
-		//fmt.Println("刊登日期:", activityMap[activity].CreateTime)
-		//fmt.Println("票卷狀態:", activityMap[activity].TicketStatus)
-		//fmt.Println("活動時間:", activityMap[activity].ActivityTime)
 		number++
 
 		result = append(result, activityMap[activity])
@@ -102,7 +78,7 @@ func (as *activityService) GetKktixActivity(category string) []*po.KktixActivity
 func (as *activityService) getTravelTaipeiAllTravelList() []*po.TravelList {
 	themesURL := as.getTravelTaipeiThemesList()
 
-	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
+	c := colly.NewCollector(colly.UserAgent(utils.RandomAgent()))
 
 	travelList := []*po.TravelList{}
 	tmpCategory := ""
@@ -133,7 +109,7 @@ func (as *activityService) getTravelTaipeiAllTravelList() []*po.TravelList {
 }
 
 func (as *activityService) getTravelTaipeiThemesList() map[string]string {
-	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
+	c := colly.NewCollector(colly.UserAgent(utils.RandomAgent()))
 
 	themesURLs := make(map[string]string)
 	c.OnHTML("ul.d-flex > li.col-6", func(e *colly.HTMLElement) {
@@ -148,7 +124,7 @@ func (as *activityService) getTravelTaipeiThemesList() map[string]string {
 }
 
 func (as *activityService) getTravelTaipeiExhibitionItems() []*po.TTActivity {
-	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
+	c := colly.NewCollector(colly.UserAgent(utils.RandomAgent()))
 	resultItems := []*po.TTActivity{}
 
 	visitTag := true
@@ -199,8 +175,8 @@ func (as *activityService) activityIsEnd(activityTime string) bool {
 	return false
 }
 func (as *activityService) getKKtixActivityItems(url string) (map[string]*po.KktixActivity, []string) {
-	c := colly.NewCollector(colly.UserAgent(as.randomAgent()))
-	d := colly.NewCollector(colly.UserAgent(as.randomAgent()))
+	c := colly.NewCollector(colly.UserAgent(utils.RandomAgent()))
+	d := colly.NewCollector(colly.UserAgent(utils.RandomAgent()))
 
 	activityMap := make(map[string]*po.KktixActivity)
 	forSortSlice := []string{}
@@ -217,7 +193,7 @@ func (as *activityService) getKKtixActivityItems(url string) (map[string]*po.Kkt
 				URL: url,
 			}
 			ex.ForEach("a.cover", func(j int, el *colly.HTMLElement) {
-				activityMap[url].Title = el.ChildText("div.event-title")
+				activityMap[url].Title = utils.RemoveExtraChar(el.ChildText("div.event-title"))
 				activityMap[url].Introduction = el.ChildText("div.introduction")
 				activityMap[url].Category = el.ChildText("span.category")
 				activityMap[url].CreateTime = el.ChildText("div.ft > span.date")
@@ -271,7 +247,7 @@ func (as *activityService) getKKtixActivityItems(url string) (map[string]*po.Kkt
 
 func (as *activityService) getKktixPageByURL(url string) map[string]bool {
 	pageColly := colly.NewCollector(
-		colly.UserAgent(as.randomAgent()),
+		colly.UserAgent(utils.RandomAgent()),
 	)
 
 	visitURL := make(map[string]bool)
@@ -299,14 +275,4 @@ func (as *activityService) getKktixPageByURL(url string) map[string]bool {
 	pageColly.Visit(url)
 
 	return visitURL
-}
-
-func (as *activityService) randomAgent() string {
-	rn := random(1, 4)
-	return userAgent[rn]
-}
-
-func random(min, max int) int {
-	rand.Seed(time.Now().Unix())
-	return rand.Intn(max-min) + min
 }

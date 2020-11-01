@@ -1,6 +1,6 @@
 module github.com/gfes980615/Diana
 
-go 1.13
+go 1.15
 
 require (
 	github.com/antchfx/htmlquery v1.2.3 // indirect

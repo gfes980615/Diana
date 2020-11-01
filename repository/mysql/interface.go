@@ -24,6 +24,8 @@ type Maple8591ProductRepository interface {
 
 type TravelRepository interface {
 	CreateTravelTaipeiTravelItem(DB *gorm.DB, items []*po.TravelList) error
+	CreateTaoyuanTravelItem(DB *gorm.DB, items []*po.TouristAttractionList) error
+	GetTravelListByArea(DB *gorm.DB, country, loction string) ([]*po.TouristAttractionList, error)
 }
 
 type ActivityRepository interface {

@@ -9,6 +9,7 @@ import (
 	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/gfes980615/Diana/repository/mysql"
+	"github.com/gfes980615/Diana/utils"
 	"github.com/gocolly/colly"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"log"
@@ -136,7 +137,7 @@ func (cs *currencyService) setProductToCurrency(products []*po.Maple8591Product)
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: removeExtraChar(product.Title), URL: root8591 + product.URL})
+		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: product.Server, Title: utils.RemoveExtraChar(product.Title), URL: root8591 + product.URL})
 	}
 
 	sort.Slice(currencySlice, func(i, j int) bool {
@@ -187,7 +188,7 @@ func (cs *currencyService) get8591CurrencyValueTop5(mapleServer string) ([]float
 			b, _ := strconv.ParseFloat(item[2], 64)
 			value = b / a
 		}
-		name := removeExtraChar(title.Name)
+		name := utils.RemoveExtraChar(title.Name)
 		url := replaceQuestionMark(title.URL)
 		currencySlice = append(currencySlice, &po.Currency{Value: value, Server: mapleServer, Title: name, URL: url})
 	}

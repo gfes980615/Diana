@@ -54,3 +54,16 @@ func (lm *LineMessage) Init(ctx *gin.Context) error {
 	}
 	return nil
 }
+
+type TravelReq struct {
+	Country  string `form:"country"`
+	Location string `form:"location"`
+}
+
+func (tr *TravelReq) Init(ctx *gin.Context) error {
+	err := ctx.ShouldBind(tr)
+	if err != nil {
+		return err
+	}
+	return nil
+}
