@@ -49,11 +49,13 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 }
 
 func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
+	log.Println("before switch eventTypeMessage")
 	switch event.Message.(type) {
 	case *linebot.TextMessage:
+		log.Println("case 1")
 		return ls.textMessageCommand(event)
 	case *linebot.LocationMessage:
-		log.Println("eventTypeMessage")
+		log.Println("case 2")
 		return ls.locationMessageCommand(event)
 	default:
 		return fmt.Errorf("the message type doesn't handle : %v", event.Message)
