@@ -145,5 +145,6 @@ func (ts *travelService) GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*p
 			break
 		}
 	}
+	log.Println("GetClosestTravelPlaceListTop5 success")
 	return result, nil
 }
