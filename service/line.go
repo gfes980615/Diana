@@ -40,7 +40,6 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 
 	DB := db.MysqlConn.Session()
 	go ls.lineUserRepository.Create(DB, event.Source.UserID)
-	log.Println("start")
 	switch event.Type {
 	case linebot.EventTypeMessage:
 		err = ls.eventTypeMessage(event)
@@ -49,13 +48,10 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 }
 
 func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
-	log.Println("before switch eventTypeMessage")
 	switch event.Message.(type) {
 	case *linebot.TextMessage:
-		log.Println("case 1")
 		return ls.textMessageCommand(event)
 	case *linebot.LocationMessage:
-		log.Println("case 2")
 		return ls.locationMessageCommand(event)
 	default:
 		return fmt.Errorf("the message type doesn't handle : %v", event.Message)
@@ -90,8 +86,6 @@ func (ls *lineService) textMessageCommand(event *linebot.Event) error {
 	}
 
 	if keyword == "活動" {
-		tmp := ls.GetActivityMessage()
-		log.Println(len(tmp))
 		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ls.GetActivityMessage())).Do()
 		return nil
 	}
@@ -147,7 +141,6 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 	for _, r := range result {
 		rMessage += fmt.Sprintf("景點: %s\n網址: %s\n\n", r.Place, r.URL)
 	}
-	log.Println(len(rMessage))
 	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rMessage)).Do()
 
 	return nil

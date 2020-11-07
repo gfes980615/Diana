@@ -142,7 +142,6 @@ func (ts *travelService) GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*p
 	for _, list := range distanceList {
 		result = append(result, distanceMap[list]...)
 		if len(result) > 5 {
-			result = result[:5]
 			break
 		}
 	}

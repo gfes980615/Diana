@@ -73,8 +73,8 @@ func (ctl *travelController) getLatLng(ctx *gin.Context) {
 
 func (ctl *travelController) testLatLng(ctx *gin.Context) {
 	testValue := &bo.LatLong{
-		Lat: 24.8961,
-		Lng: 121.273,
+		Lat: 25.0224158,
+		Lng: 121.2862669,
 	}
 	result, err := ctl.travelService.GetClosestTravelPlaceListTop5(testValue)
 	if err != nil {
