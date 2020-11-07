@@ -138,7 +138,7 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 		Lat: message.Latitude,
 		Lng: message.Longitude,
 	}
-	log.Println(message.Latitude)
+	log.Infof("lat:%f , lng:%f", message.Latitude, message.Longitude)
 	result, err := ls.travelService.GetClosestTravelPlaceListTop5(latlng)
 	if err != nil {
 		return err
@@ -146,7 +146,6 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 	rMessage := ""
 	for _, r := range result {
 		rMessage += fmt.Sprintf("景點: %s\n網址: %s\n\n", r.Place, r.URL)
-		log.Println(rMessage)
 	}
 	log.Println(len(rMessage))
 	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rMessage)).Do()
