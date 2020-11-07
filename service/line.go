@@ -146,7 +146,7 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 		rMessage += fmt.Sprintf("景點: %s\n地址: %s\n網址: %s\n\n", r.Place, r.Address, r.URL)
 	}
 	log.Println(len(rMessage))
-	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rMessage)).Do()
+	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("rMessage")).Do()
 
 	return nil
 }
