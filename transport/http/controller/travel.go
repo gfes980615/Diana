@@ -83,7 +83,7 @@ func (ctl *travelController) testLatLng(ctx *gin.Context) {
 	}
 	message := ""
 	for _, r := range result {
-		message += fmt.Sprintf("景點: %s\n地址: %s\n網址: %s\n\n", r.Place, r.Address, r.URL)
+		message += fmt.Sprintf("景點: %s\n網址: %s\n距離:%s\n\n", r.Place, r.URL, r.Distance)
 	}
 	common.Send(ctx, message)
 }

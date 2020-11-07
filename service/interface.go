@@ -38,5 +38,5 @@ type ActivityService interface {
 type TravelService interface {
 	TaoyuanTravelPlace() error
 	GetTravelPlaceByArea(country, location string) ([]*po.TouristAttractionList, error)
-	GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*po.TouristAttractionList, error)
+	GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*dto.TouristAttractionList, error)
 }

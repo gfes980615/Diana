@@ -7,6 +7,7 @@ import (
 	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/bo"
+	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/gfes980615/Diana/repository/mysql"
 	"github.com/gfes980615/Diana/utils"
@@ -118,27 +119,30 @@ func (ts *travelService) GetPlaceLatLong() {
 
 }
 
-func (ts *travelService) GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*po.TouristAttractionList, error) {
+func (ts *travelService) GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*dto.TouristAttractionList, error) {
 	travelList, err := ts.travelRepository.GetAllTravelList(db.MysqlConn.Session())
 	if err != nil {
 		return nil, err
 	}
 	distanceList := []float64{}
-	distanceMap := make(map[float64][]*po.TouristAttractionList)
+	distanceMap := make(map[float64][]*dto.TouristAttractionList)
 	for _, list := range travelList {
 		distance := utils.EarthDistance(latlng.Lat, latlng.Lng, list.Latitude, list.Longitude)
 		distanceList = append(distanceList, distance)
 		if _, ok := distanceMap[distance]; !ok {
-			distanceMap[distance] = []*po.TouristAttractionList{}
+			distanceMap[distance] = []*dto.TouristAttractionList{}
 		}
-		distanceMap[distance] = append(distanceMap[distance], list)
+		dtoItem := utils.StructCopy(list, dto.TouristAttractionList{})
+		res := dtoItem.(*dto.TouristAttractionList)
+		res.Distance = fmt.Sprintf("%.2f公里", distance)
+		distanceMap[distance] = append(distanceMap[distance], res)
 	}
 
 	sort.Slice(distanceList, func(i, j int) bool {
-		return distanceList[i] > distanceList[j]
+		return distanceList[i] < distanceList[j]
 	})
 
-	result := []*po.TouristAttractionList{}
+	result := []*dto.TouristAttractionList{}
 	for _, list := range distanceList {
 		result = append(result, distanceMap[list]...)
 		if len(result) > 5 {

@@ -17,7 +17,7 @@ func RemoveExtraChar(title string) string {
 }
 
 func EarthDistance(lat1, lng1, lat2, lng2 float64) float64 {
-	radius := float64(6371000) // 6378137
+	radius := 6371000.0 //6378137.0
 	rad := math.Pi / 180.0
 	lat1 = lat1 * rad
 	lng1 = lng1 * rad
@@ -25,7 +25,7 @@ func EarthDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	lng2 = lng2 * rad
 	theta := lng2 - lng1
 	dist := math.Acos(math.Sin(lat1)*math.Sin(lat2) + math.Cos(lat1)*math.Cos(lat2)*math.Cos(theta))
-	return dist * radius
+	return dist * radius / 1000
 }
 
 func TraceMemStats() uint64 {

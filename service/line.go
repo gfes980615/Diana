@@ -139,7 +139,7 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 	}
 	rMessage := ""
 	for _, r := range result {
-		rMessage += fmt.Sprintf("景點: %s\n網址: %s\n\n", r.Place, r.URL)
+		rMessage += fmt.Sprintf("景點: %s\n網址: %s\n距離:%s\n\n", r.Place, r.URL, r.Distance)
 	}
 	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rMessage)).Do()
 

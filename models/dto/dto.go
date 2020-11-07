@@ -67,3 +67,18 @@ func (tr *TravelReq) Init(ctx *gin.Context) error {
 	}
 	return nil
 }
+
+type TouristAttractionList struct {
+	Place    string
+	URL      string
+	Address  string
+	Distance string
+}
+
+func (a TouristAttractionList) GetStruct() interface{} {
+	return TouristAttractionList{}
+}
+
+func (a TouristAttractionList) GetStructPtr() interface{} {
+	return &TouristAttractionList{}
+}
