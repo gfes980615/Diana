@@ -90,6 +90,8 @@ func (ls *lineService) textMessageCommand(event *linebot.Event) error {
 	}
 
 	if keyword == "活動" {
+		tmp := ls.GetActivityMessage()
+		log.Println(len(tmp))
 		glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(ls.GetActivityMessage())).Do()
 		return nil
 	}
@@ -143,10 +145,10 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 	}
 	rMessage := ""
 	for _, r := range result {
-		rMessage += fmt.Sprintf("景點: %s\n地址: %s\n網址: %s\n\n", r.Place, r.Address, r.URL)
+		rMessage += fmt.Sprintf("景點: %s\n網址: %s\n\n", r.Place, r.URL)
 	}
 	log.Println(len(rMessage))
-	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("rMessage")).Do()
+	glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rMessage)).Do()
 
 	return nil
 }
