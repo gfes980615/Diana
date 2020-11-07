@@ -6,10 +6,12 @@ import (
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/injection"
+	"github.com/gfes980615/Diana/models/bo"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/gfes980615/Diana/repository/mysql"
 	"github.com/gfes980615/Diana/utils"
 	"github.com/gocolly/colly"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -116,6 +118,32 @@ func (ts *travelService) GetPlaceLatLong() {
 
 }
 
-func (ts *travelService) GetClosestTravelPlaceList() {
+func (ts *travelService) GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*po.TouristAttractionList, error) {
+	travelList, err := ts.travelRepository.GetAllTravelList(db.MysqlConn.Session())
+	if err != nil {
+		return nil, err
+	}
+	distanceList := []float64{}
+	distanceMap := make(map[float64][]*po.TouristAttractionList)
+	for _, list := range travelList {
+		distance := utils.EarthDistance(latlng.Lat, latlng.Lng, list.Latitude, list.Longitude)
+		distanceList = append(distanceList, distance)
+		if _, ok := distanceMap[distance]; !ok {
+			distanceMap[distance] = []*po.TouristAttractionList{}
+		}
+		distanceMap[distance] = append(distanceMap[distance], list)
+	}
 
+	sort.Slice(distanceList, func(i, j int) bool {
+		return distanceList[i] > distanceList[j]
+	})
+
+	result := []*po.TouristAttractionList{}
+	for _, list := range distanceList {
+		result = append(result, distanceMap[list]...)
+		if len(result) >= 5 {
+			break
+		}
+	}
+	return result, nil
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/gfes980615/Diana/models/bo"
 	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -37,4 +38,5 @@ type ActivityService interface {
 type TravelService interface {
 	TaoyuanTravelPlace() error
 	GetTravelPlaceByArea(country, location string) ([]*po.TouristAttractionList, error)
+	GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*po.TouristAttractionList, error)
 }

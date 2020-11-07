@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/gfes980615/Diana/models/bo"
 	"github.com/gfes980615/Diana/utils"
 	"regexp"
 	"strings"
@@ -26,6 +27,7 @@ type lineService struct {
 	spiderService      SpiderService            `injection:"spiderService"`
 	lineUserRepository mysql.LineUserRepository `injection:"lineUserRepository"`
 	activityService    ActivityService          `injection:"activityService"`
+	travelService      TravelService            `injection:"travelService"`
 }
 
 func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
@@ -51,7 +53,7 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 	case *linebot.TextMessage:
 		return ls.textMessageCommand(event)
 	case *linebot.LocationMessage:
-
+		return ls.locationMessageCommand(event)
 	default:
 		return fmt.Errorf("the message type doesn't handle : %v", event.Message)
 	}
@@ -127,8 +129,19 @@ func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
 		errMessage := "message type is not linebot.LocationMessage"
 		return errors.New(errMessage)
 	}
-
-	_, err := glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Address)).Do()
+	latlng := &bo.LatLong{
+		Lat: message.Latitude,
+		Lng: message.Longitude,
+	}
+	result, err := ls.travelService.GetClosestTravelPlaceListTop5(latlng)
+	if err != nil {
+		return err
+	}
+	rMessage := ""
+	for _, r := range result {
+		rMessage += fmt.Sprintf("景點: %s\n地址: %s\n網址: %s\n\n", r.Place, r.Address, r.URL)
+	}
+	_, err = glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rMessage)).Do()
 
 	return err
 }

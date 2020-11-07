@@ -48,9 +48,6 @@ func (lc *LineController) callbackLineTemplateHandler(ctx *gin.Context) {
 		log.Print(err)
 		return
 	}
-	log.Println(conds.LineEvents)
-	log.Println(conds.Events)
-	log.Println(conds.LineEvents[0].Type)
 	err = lc.lineService.ReplyMessage(conds.LineEvents)
 	if err != nil {
 		log.Print(err)

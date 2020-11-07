@@ -50,3 +50,14 @@ func (tr *travelRepository) GetTravelListByArea(DB *gorm.DB, country, loction st
 
 	return items, nil
 }
+
+func (tr *travelRepository) GetAllTravelList(DB *gorm.DB) ([]*po.TouristAttractionList, error) {
+	items := []*po.TouristAttractionList{}
+
+	result := DB.Find(&items)
+	if err := result.Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}

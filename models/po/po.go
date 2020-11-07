@@ -74,12 +74,14 @@ func (t TravelList) TableName() string {
 }
 
 type TouristAttractionList struct {
-	Place        string `gorm:"place"`
-	URL          string `gorm:"url"`
-	ActivityTime string `gorm:"activity_time"`
-	Country      string `gorm:"country"`
-	Location     string `gorm:"location"`
-	Address      string `gorm:"address"`
+	Place        string  `gorm:"place"`
+	URL          string  `gorm:"url"`
+	ActivityTime string  `gorm:"activity_time"`
+	Country      string  `gorm:"country"`
+	Location     string  `gorm:"location"`
+	Address      string  `gorm:"address"`
+	Latitude     float64 `gorm:"latitude"`
+	Longitude    float64 `gorm:"longitude"`
 }
 
 func (t TouristAttractionList) TableName() string {

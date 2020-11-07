@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/injection"
+	"github.com/gfes980615/Diana/models/bo"
 	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/service"
 	"github.com/gfes980615/Diana/transport/http/common"
@@ -26,7 +28,11 @@ func (ctl *travelController) SetupRouter(router *gin.Engine) {
 		travel.GET("/taoyuan/list", ctl.getTaoyuanPlace)
 		// 根據輸入的縣市從資料庫取得景點
 		travel.GET("/area", ctl.getTravelPlaceByArea)
-		travel.GET("/get_lat_lng", ctl.getLatLng)
+		travel.GET("/test", ctl.testLatLng)
+	}
+	tool := router.Group("/diana/tool")
+	{
+		tool.GET("/get_lat_lng", ctl.getLatLng)
 	}
 }
 
@@ -63,4 +69,21 @@ func (ctl *travelController) getLatLng(ctx *gin.Context) {
 		return
 	}
 	common.Send(ctx, "success")
+}
+
+func (ctl *travelController) testLatLng(ctx *gin.Context) {
+	testValue := &bo.LatLong{
+		Lat: 24.8961,
+		Lng: 121.273,
+	}
+	result, err := ctl.travelService.GetClosestTravelPlaceListTop5(testValue)
+	if err != nil {
+		common.Error(ctx, err)
+		return
+	}
+	message := ""
+	for _, r := range result {
+		message += fmt.Sprintf("景點: %s\n地址: %s\n網址: %s\n\n", r.Place, r.Address, r.URL)
+	}
+	common.Send(ctx, message)
 }
