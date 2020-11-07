@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob/common/log"
-	"strconv"
-	"strings"
-
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/po"
 	"github.com/gfes980615/Diana/repository/mysql"
 	"github.com/gfes980615/Diana/utils"
 	"github.com/gocolly/colly"
+	"strconv"
+	"strings"
 )
 
 func init() {
@@ -111,4 +110,12 @@ func (ts *travelService) GetTravelPlaceByArea(country, location string) ([]*po.T
 		return nil, err
 	}
 	return result, nil
+}
+
+func (ts *travelService) GetPlaceLatLong() {
+
+}
+
+func (ts *travelService) GetClosestTravelPlaceList() {
+
 }

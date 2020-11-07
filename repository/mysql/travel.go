@@ -42,6 +42,7 @@ func (tr *travelRepository) CreateTaoyuanTravelItem(DB *gorm.DB, items []*po.Tou
 
 func (tr *travelRepository) GetTravelListByArea(DB *gorm.DB, country, loction string) ([]*po.TouristAttractionList, error) {
 	items := []*po.TouristAttractionList{}
+
 	result := DB.Debug().Where("country = ? and location = ?", country, loction).Find(&items)
 	if err := result.Error; err != nil {
 		return nil, err

@@ -47,6 +47,19 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 }
 
 func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
+	switch event.Message.(type) {
+	case *linebot.TextMessage:
+		return ls.textMessageCommand(event)
+	case *linebot.LocationMessage:
+
+	default:
+		return fmt.Errorf("the message type doesn't handle : %v", event.Message)
+	}
+
+	return errors.New("unexpected error")
+}
+
+func (ls *lineService) textMessageCommand(event *linebot.Event) error {
 	message, ok := event.Message.(*linebot.TextMessage)
 	if !ok {
 		errMessage := "message type is not linebot.TextMessage"
@@ -106,6 +119,18 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 	//	log.Print(err)
 	//}
 	return nil
+}
+
+func (ls *lineService) locationMessageCommand(event *linebot.Event) error {
+	message, ok := event.Message.(*linebot.LocationMessage)
+	if !ok {
+		errMessage := "message type is not linebot.LocationMessage"
+		return errors.New(errMessage)
+	}
+
+	_, err := glob.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Address)).Do()
+
+	return err
 }
 
 func (ls *lineService) GetActivityMessage() string {
