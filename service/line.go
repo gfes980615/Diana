@@ -40,7 +40,7 @@ func (ls *lineService) ReplyMessage(events []*linebot.Event) error {
 
 	DB := db.MysqlConn.Session()
 	go ls.lineUserRepository.Create(DB, event.Source.UserID)
-
+	log.Println("start")
 	switch event.Type {
 	case linebot.EventTypeMessage:
 		err = ls.eventTypeMessage(event)
@@ -53,6 +53,7 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 	case *linebot.TextMessage:
 		return ls.textMessageCommand(event)
 	case *linebot.LocationMessage:
+		log.Println("eventTypeMessage")
 		return ls.locationMessageCommand(event)
 	default:
 		return fmt.Errorf("the message type doesn't handle : %v", event.Message)
