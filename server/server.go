@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"github.com/gfes980615/Diana/cronjob"
 
 	_ "github.com/gfes980615/Diana/transport/http/controller"
 
@@ -41,6 +42,7 @@ func Run() error {
 	if err := db.InitMysql(config.Config.DatabaseConfig.Mysql); err != nil {
 		return err
 	}
+	db.InitRedis()
 
 	if err := injection.InitInject(); err != nil {
 		return err
@@ -51,6 +53,8 @@ func Run() error {
 	} else {
 		go run(router, stop)
 	}
+
+	cronjob.InitJob()
 
 	log.Info("Server start.")
 	err := <-stop

@@ -34,3 +34,10 @@ func TraceMemStats() uint64 {
 	//log.Printf("Alloc:%d(bytes) HeapIdle:%d(bytes) HeapReleased:%d(bytes)", ms.Alloc, ms.HeapIdle, ms.HeapReleased)
 	return ms.Alloc
 }
+
+func EmptyString(str string) bool {
+	if len(str) == 0 {
+		return true
+	}
+	return false
+}

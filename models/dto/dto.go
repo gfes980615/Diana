@@ -82,3 +82,10 @@ func (a TouristAttractionList) GetStruct() interface{} {
 func (a TouristAttractionList) GetStructPtr() interface{} {
 	return &TouristAttractionList{}
 }
+
+type MapleBulletin struct {
+	Category string `json:"category"`
+	Date     string `json:"date"`
+	Title    string `json:"title"`
+	URL      string `json:"url"`
+}

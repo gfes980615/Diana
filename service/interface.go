@@ -40,3 +40,20 @@ type TravelService interface {
 	GetTravelPlaceByArea(country, location string) ([]*po.TouristAttractionList, error)
 	GetClosestTravelPlaceListTop5(latlng *bo.LatLong) ([]*dto.TouristAttractionList, error)
 }
+
+type WallPaperService interface {
+	GetWallPaper()
+}
+
+type EnglishService interface {
+	GetDailySentence()
+}
+
+type MapleBulletinService interface {
+	GetBulletinMessage() (string, error)
+	PushToLine()
+}
+
+type RemoteService interface {
+	Simple(api string)
+}
