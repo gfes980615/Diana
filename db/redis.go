@@ -1,8 +1,6 @@
 package db
 
-import (
-	"github.com/go-redis/redis/v8"
-)
+import "github.com/go-redis/redis/v7"
 
 var RDB *redis.Client
 
