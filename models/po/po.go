@@ -87,3 +87,13 @@ type TouristAttractionList struct {
 func (t TouristAttractionList) TableName() string {
 	return "tourist_attraction_list"
 }
+
+type EnglishSentence struct {
+	Date        time.Time `gorm:"date"`
+	Content     string    `gorm:"content"`
+	Translation string    `gorm:"translation"`
+}
+
+func (e EnglishSentence) TableName() string {
+	return "english_sentence"
+}

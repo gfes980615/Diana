@@ -46,7 +46,7 @@ type WallPaperService interface {
 }
 
 type EnglishService interface {
-	GetDailySentence()
+	SendDailyMessage() error
 }
 
 type MapleBulletinService interface {

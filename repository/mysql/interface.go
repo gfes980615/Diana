@@ -32,3 +32,7 @@ type TravelRepository interface {
 type ActivityRepository interface {
 	CreateKKtixActivityItem(DB *gorm.DB, items []*po.KktixActivity) error
 }
+
+type EnglishRepository interface {
+	Search(DB *gorm.DB) (*po.EnglishSentence, error)
+}

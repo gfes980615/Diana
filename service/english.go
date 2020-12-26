@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
+	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/injection"
-	"github.com/gfes980615/Diana/utils"
-	"github.com/gocolly/colly"
+	"github.com/gfes980615/Diana/repository/mysql"
 )
 
 func init() {
@@ -16,22 +16,17 @@ const (
 )
 
 type englishService struct {
+	lineService       LineService             `injection:"lineService"`
+	englishRepository mysql.EnglishRepository `injection:"englishRepository"`
 }
 
-func (es *englishService) GetDailySentence() {
-	es.dailySentence("", 0)
-}
-
-//> div.container > div.my-rwd-container > div.row > div.col
-func (es *englishService) dailySentence(url string, page int) {
-	c := colly.NewCollector(colly.UserAgent(utils.RandomAgent()))
-	c.OnHTML("div.body-container > div.v-application", func(e *colly.HTMLElement) {
-		//fmt.Println(e.ChildText("a.quote_box > div.pa-4 > h2.title_sty02"))
-		//fmt.Println(e.ChildText("a.quote_box > div.pa-4 > span"))
-		//fmt.Println(e.ChildText("a.quote_box > div.pa-4 > div.d-flex > div.text-right > div.title_syt04"))
-		//fmt.Println(e.ChildText("a.quote_box > div.pa-4 > div.d-flex > div.text-right > span"))
-		fmt.Println(e.Text)
-	})
-
-	c.Visit("https://www.managertoday.com.tw/quotes?page=1")
+func (es *englishService) SendDailyMessage() error {
+	DB := db.MysqlConn.Session()
+	content, err := es.englishRepository.Search(DB)
+	if err != nil {
+		return err
+	}
+	message := fmt.Sprintf("%s\n%s\n%s", content.Date.Format("2006-01-02"), content.Content, content.Translation)
+	es.lineService.PushMessage(message)
+	return nil
 }
