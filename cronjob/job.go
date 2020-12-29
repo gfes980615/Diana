@@ -37,13 +37,13 @@ func (cj *cronJob) CallMedusaBulletinAPI() {
 }
 
 func (cj *cronJob) CallMedusaShanbaySentenceAPI() {
-	cj.c.AddFunc("0 35 14 * * * ?", func() {
+	cj.c.AddFunc("0 30 23 * * ?", func() {
 		cj.remoteService.Simple("http://127.0.0.1:5000/shanbay/daily/sentence")
 	})
 }
 
 func (cj *cronJob) DailySentenceJob() {
-	cj.c.AddFunc("0 40 14 * * ?", func() {
+	cj.c.AddFunc("0 40 23 * * ?", func() {
 		err := cj.englishService.SendDailyMessage()
 		if err != nil {
 			log.Errorf("DailySentenceJob Error: %v", err)
