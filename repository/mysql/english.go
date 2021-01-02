@@ -16,6 +16,6 @@ type englishRepository struct {
 
 func (cr *englishRepository) Search(DB *gorm.DB) (*po.EnglishSentence, error) {
 	content := &po.EnglishSentence{}
-	err := DB.First(content).Where("date = ?", time.Now().Format("2006-01-02")).Error
+	err := DB.Where("date = ?", time.Now().Format("2006-01-02")).Find(content).Error
 	return content, err
 }
