@@ -13,6 +13,7 @@ jobs:
       - name: Start service...
         run: |
           go mod tidy
-          go run main.go
+          go build -o diana.exe
+          ./diana.exe
       - name: Call maple API
         run: curl localhost:8080/diana/currency/value
