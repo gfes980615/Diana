@@ -15,5 +15,5 @@ jobs:
           go mod tidy
           go build -o diana.exe
           ./diana.exe
-      - name: Call maple API
-        run: curl localhost:8080/diana/currency/value
+          echo "Call api"
+          curl localhost:8080/diana/currency/value
