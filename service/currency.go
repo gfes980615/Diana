@@ -2,6 +2,12 @@ package service
 
 import (
 	"fmt"
+	"log"
+	"regexp"
+	"sort"
+	"strconv"
+	"sync"
+
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob"
 	"github.com/gfes980615/Diana/injection"
@@ -12,11 +18,6 @@ import (
 	"github.com/gfes980615/Diana/utils"
 	"github.com/gocolly/colly"
 	"github.com/line/line-bot-sdk-go/linebot"
-	"log"
-	"regexp"
-	"sort"
-	"strconv"
-	"sync"
 )
 
 func init() {
@@ -116,7 +117,7 @@ func (cs *currencyService) get8591CurrencyValueTop5V2(mapleServer string) ([]flo
 	}
 	cResultSlice := currencySlice[0:defaultSize]
 	// 存入MYSQL
-	go cs.insertCurrency(cResultSlice)
+	// go cs.insertCurrency(cResultSlice)
 
 	result := []float64{}
 	for _, c := range cResultSlice {

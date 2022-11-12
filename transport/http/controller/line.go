@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gfes980615/Diana/models/dto"
@@ -57,7 +58,8 @@ func (lc *LineController) callbackLineTemplateHandler(ctx *gin.Context) {
 }
 
 func (lc *LineController) Daily(ctx *gin.Context) {
-	common.Send(ctx, lc.spiderService.GetEveryDaySentence())
+	// common.Send(ctx, lc.spiderService.GetEveryDaySentence())
+	fmt.Println(lc.spiderService.GetEveryDaySentence())
 }
 
 func (lc *LineController) dailyCurrencyMessage(ctx *gin.Context) {

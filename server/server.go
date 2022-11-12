@@ -2,13 +2,11 @@ package server
 
 import (
 	"errors"
-	"github.com/gfes980615/Diana/cronjob"
 
 	_ "github.com/gfes980615/Diana/transport/http/controller"
 
 	"github.com/gfes980615/Diana/glob/common/log"
 
-	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob/config"
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/injection/controller"
@@ -39,10 +37,10 @@ func Run() error {
 		config.Config.LogConfig.FullColor,
 		config.Config.LogConfig.FullTimestamp)
 
-	if err := db.InitMysql(config.Config.DatabaseConfig.Mysql); err != nil {
-		return err
-	}
-	db.InitRedis()
+	// if err := db.InitMysql(config.Config.DatabaseConfig.Mysql); err != nil {
+	// 	return err
+	// }
+	// db.InitRedis()
 
 	if err := injection.InitInject(); err != nil {
 		return err
@@ -54,7 +52,7 @@ func Run() error {
 		go run(router, stop)
 	}
 
-	cronjob.InitJob()
+	// cronjob.InitJob()
 
 	log.Info("Server start.")
 	err := <-stop

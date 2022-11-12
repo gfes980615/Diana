@@ -9,8 +9,8 @@ LogConfig:
   FullTimestamp: True
 NotifyConfig:
   Line:
-    ChannelSecret: b8c89a810644c31225f141eb7313254f
-    ChannelAccessToken: JkYktojuG2C6BykjnLQ6znoqOGLMq2CYaPSpgumSyaFjSrK0+Dtl6KFnpLekIW9fYXeFmq6obaLdpTrvXX735gv86OV2d61AViIEV89Q4nLkvi2DHjyDqgcttEIAvpFGPKwd+K+vbocRE0/nxOueMQdB04t89/1O/w1cDnyilFU=
+    ChannelSecret: 0c200e30763a2e353b8150a9e736dc8e
+    ChannelAccessToken: L3sK3BQ1wyiKqC/bd8Ypwzp2+dgxcZwjWNIfBYL06QJYMangBh3ycTrkLsG1pX4heyDUDEH2xK7Kgy3x/+tVoXrguejfsCZUuTh8hAik6dQolbekd5/DkQAIyECqMN8nbeVQy5SKm3XiQZsKhezE4AdB04t89/1O/w1cDnyilFU=
 GINConfig:
   Address: ":8080"
 DatabaseConfig:

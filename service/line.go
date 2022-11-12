@@ -3,10 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/gfes980615/Diana/models/bo"
-	"github.com/gfes980615/Diana/utils"
 	"regexp"
 	"strings"
+
+	"github.com/gfes980615/Diana/models/bo"
+	"github.com/gfes980615/Diana/utils"
 
 	"github.com/gfes980615/Diana/db"
 	"github.com/gfes980615/Diana/glob/common/log"
@@ -57,7 +58,7 @@ func (ls *lineService) eventTypeMessage(event *linebot.Event) error {
 		return fmt.Errorf("the message type doesn't handle : %v", event.Message)
 	}
 
-	return errors.New("unexpected error")
+	// return errors.New("unexpected error")
 }
 
 func (ls *lineService) textMessageCommand(event *linebot.Event) error {
@@ -171,14 +172,14 @@ func IsURL(url string) bool {
 }
 
 func (ls *lineService) PushMessage(message string) {
-	DB := db.MysqlConn.Session()
-	lineUsers, err := ls.lineUserRepository.GetAllUser(DB)
-	if err != nil {
-		log.Errorf("get line user error %v", err)
-		return
-	}
+	// DB := db.MysqlConn.Session()
+	// lineUsers, err := ls.lineUserRepository.GetAllUser(DB)
+	// if err != nil {
+	// 	log.Errorf("get line user error %v", err)
+	// 	return
+	// }
 
-	for _, u := range lineUsers {
-		glob.Bot.PushMessage(u.UserID, linebot.NewTextMessage(message)).Do()
-	}
+	// for _, u := range lineUsers {
+	glob.Bot.PushMessage("Uc5bc43d234a87562646828ec4229ed4c", linebot.NewTextMessage(message)).Do()
+	// }
 }

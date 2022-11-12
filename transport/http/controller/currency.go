@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/service"
 	"github.com/gfes980615/Diana/transport/http/common"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func init() {
@@ -15,6 +16,7 @@ func init() {
 
 type CurrencyController struct {
 	currencyService         service.CurrencyService         `injection:"currencyService"`
+	lineService             service.LineService             `injection:"lineService"`
 	maple8591ProductService service.Maple8591ProductService `injection:"maple8591ProductService"`
 }
 
@@ -48,6 +50,8 @@ func (ctl *CurrencyController) currencyValue(ctx *gin.Context) {
 	testMessage := &dto.Message{
 		Message: message,
 	}
+
+	ctl.lineService.PushMessage(message)
 
 	common.Send(ctx, testMessage)
 }
