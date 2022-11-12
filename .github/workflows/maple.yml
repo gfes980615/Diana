@@ -7,6 +7,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Start service...
-        run: go run main.go
+        run: |
+          go run main.go
+          sleep 10s
       - name: Call maple API
         run: curl localhost:8080/diana/currency/value
