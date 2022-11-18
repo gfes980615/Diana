@@ -7,6 +7,6 @@ jobs:
       image: gfes980615/maple
     steps:
       - name: Get maple currency
-        run: |
-          echo "Call api"
-          curl localhost:8080/diana/currency/value
+        uses: wei/curl@master
+        with:
+          args: http://localhost:8080/diana/currency/value
