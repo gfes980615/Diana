@@ -1,4 +1,4 @@
-FROM golang:1.14.4-alpine
+FROM golang:1.18.1-alpine
 WORKDIR /diana
 ADD . /diana
 RUN cd /diana
