@@ -1,12 +1,19 @@
 name: maple currency
-on: push
+on:
+  push:
+    branches:
+      - 'maple'
 jobs:
   maple_currency:
     runs-on: ubuntu-latest
-    container:
-      image: gfes980615/maple
     steps:
-      - name: Get maple currency
-        uses: wei/curl@master
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
         with:
-          args: http://localhost:8080/diana/currency/value
+          go-version: 1.19.3
+      - name: Get maple currency
+        run: |
+          go mod tidy
+          go run main.go

@@ -22,6 +22,9 @@ func (ctl *HealthController) SetupRouter(router *gin.Engine) {
 	controller.GET("/test", ctl.forTest)
 }
 
+func (ctl *HealthController) StartMaple(router *gin.Engine) {
+}
+
 func (ctl *HealthController) HeathCheck(ctx *gin.Context) {
 	ctx.JSON(common.Success, "ok")
 }

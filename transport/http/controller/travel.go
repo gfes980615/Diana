@@ -2,6 +2,8 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gfes980615/Diana/glob/common/log"
 	"github.com/gfes980615/Diana/injection"
 	"github.com/gfes980615/Diana/models/bo"
@@ -10,7 +12,6 @@ import (
 	"github.com/gfes980615/Diana/transport/http/common"
 	"github.com/gfes980615/Diana/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func init() {
@@ -34,6 +35,9 @@ func (ctl *travelController) SetupRouter(router *gin.Engine) {
 	{
 		tool.GET("/get_lat_lng", ctl.getLatLng)
 	}
+}
+
+func (ctl *travelController) StartMaple(router *gin.Engine) {
 }
 
 func (ctl *travelController) getTaoyuanPlace(ctx *gin.Context) {

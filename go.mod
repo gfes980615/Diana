@@ -11,7 +11,6 @@ require (
 	github.com/go-redis/redis/v7 v7.3.0
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocolly/colly v1.2.0
-	github.com/huweihuang/cobra-demo v0.0.0-20190927130152-0bf30f637646
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/kennygrant/sanitize v1.2.4 // indirect
@@ -22,6 +21,7 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.5.0
 	github.com/temoto/robotstxt v1.1.1 // indirect
+	golang.org/x/sys v0.3.0 // indirect
 	gorm.io/driver/mysql v1.0.1
 	gorm.io/gorm v1.20.1
 )

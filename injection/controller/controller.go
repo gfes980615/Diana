@@ -25,7 +25,7 @@ func InitControllerDictionary() error {
 	}
 
 	for _, c := range controller {
-		ControllerDictionary = append(ControllerDictionary, c.MethodByName("SetupRouter"))
+		ControllerDictionary = append(ControllerDictionary, c.MethodByName("StartMaple"))
 	}
 
 	return nil

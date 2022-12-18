@@ -33,6 +33,9 @@ func (lc *LineController) SetupRouter(router *gin.Engine) {
 	router.GET("/debug", lc.Debug)
 }
 
+func (ctl *LineController) StartMaple(router *gin.Engine) {
+}
+
 func (lc *LineController) callbackHandler(ctx *gin.Context) {
 	events, err := glob.Bot.ParseRequest(ctx.Request)
 	if err != nil {

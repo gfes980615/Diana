@@ -20,12 +20,15 @@ func (ctl *ActivityController) SetupRouter(router *gin.Engine) {
 	controller.GET("/travel_taipei/:category", ctl.getTravelTaipeiActivity)
 }
 
+func (ctl *ActivityController) StartMaple(router *gin.Engine) {
+}
+
 func (ctl *ActivityController) getKktixActivity(ctx *gin.Context) {
-	category:=ctx.Param("category")
+	category := ctx.Param("category")
 	ctl.activityService.GetKktixActivity(category)
 }
 
 func (ctl *ActivityController) getTravelTaipeiActivity(ctx *gin.Context) {
-	category:=ctx.Param("category")
+	category := ctx.Param("category")
 	ctl.activityService.GetTravelTaipeiActivity(category)
 }

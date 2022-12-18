@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gfes980615/Diana/injection"
-	"github.com/gfes980615/Diana/models/dto"
 	"github.com/gfes980615/Diana/service"
 	"github.com/gfes980615/Diana/transport/http/common"
 	"github.com/gin-gonic/gin"
@@ -28,6 +27,10 @@ func (ctl *CurrencyController) SetupRouter(router *gin.Engine) {
 	controller.GET("/test", ctl.get8591AllProduct)
 }
 
+func (ctl *CurrencyController) StartMaple(router *gin.Engine) {
+	ctl.currencyValue(&gin.Context{})
+}
+
 //func (ctl *CurrencyController) currencyChart(ctx *gin.Context) {
 //	ctx.JSON(common.Success, "ok")
 //}
@@ -37,7 +40,7 @@ func (ctl *CurrencyController) currencyValue(ctx *gin.Context) {
 		Server string `form:"server"`
 	}
 	t := &Tmp{}
-	ctx.Bind(t)
+	// ctx.Bind(t)
 
 	var message string
 	switch t.Server {
@@ -47,13 +50,13 @@ func (ctl *CurrencyController) currencyValue(ctx *gin.Context) {
 		message = ctl.currencyService.GetMapleCurrencyMessage(t.Server)
 	}
 
-	testMessage := &dto.Message{
-		Message: message,
-	}
+	// testMessage := &dto.Message{
+	// 	Message: message,
+	// }
 
 	ctl.lineService.PushMessage(message)
 
-	common.Send(ctx, testMessage)
+	// common.Send(ctx, testMessage)
 }
 
 func (ctl *CurrencyController) currencyChart(c *gin.Context) {
