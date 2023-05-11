@@ -1,7 +1,7 @@
 name: maple currency
 on:
   schedule:
-    - cron: "10 12 * * *"
+    - cron: "10 4 * * *"
 jobs:
   maple_currency:
     runs-on: ubuntu-latest
