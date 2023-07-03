@@ -47,7 +47,8 @@ func (ctl *CurrencyController) currencyValue(ctx *gin.Context) {
 	case "all":
 		message = ctl.currencyService.GetAllServerCurrency()
 	default:
-		message = ctl.currencyService.GetMapleCurrencyMessage(t.Server)
+		// message = ctl.currencyService.GetMapleCurrencyMessage(t.Server)
+		message = ctl.currencyService.GetMapleCurrencyMessage("izcr")
 	}
 
 	// testMessage := &dto.Message{
